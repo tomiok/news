@@ -1,16 +1,21 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/mmcdole/gofeed"
+	"news/internal/collector"
 )
 
 func main() {
-	fp := gofeed.NewParser()
-	fp.UserAgent = "MyCustomAgent 1.0"
-	feed, _ := fp.ParseURL("https://www.eldiarioar.com/rss")
-	fmt.Println(feed.Items[0].Title)
-	fmt.Println(feed.Items[0].Content)
+	scanner := collector.NewSiteScanner()
 
-	fmt.Println("hello news!")
+	values := scanner.GetSites()
+
+	rssCollector := collector.NewCollector()
+
+	res, _ := rssCollector.Collect(context.Background(), values[0])
+
+	for _, v := range res {
+		fmt.Println(v.String())
+	}
 }
