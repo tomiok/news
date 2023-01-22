@@ -1,11 +1,13 @@
 CREATE TABLE articles
 (
     id          INT          NOT NULL AUTO_INCREMENT,
-    uid         VARCHAR(100) NOT NULL,
     title       VARCHAR(255) NOT NULL,
-    link        VARCHAR(255) NOT NULL,
-    lang        VARCHAR(10)  NOT NULL,
     description TEXT         NOT NULL,
+    content     TEXT         NOT NULL,
+    link        VARCHAR(255) NOT NULL,
+    country     VARCHAR(10)  NOT NULL,
+    location    VARCHAR(100) NOT NULL,
+    lang        VARCHAR(10)  NOT NULL,
     pub_date    TIMESTAMP    NOT NULL,
     PRIMARY KEY (id)
 );
