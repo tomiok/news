@@ -23,7 +23,8 @@ type Collector interface {
 type Article struct {
 	ID          string
 	Title       string
-	Description string
+	Description string // is like subtitle
+	Content     string // content is the news itself. Some sites may don't have it.
 	Country     string // ISO code for the country AR, UY, BR...
 	Location    string // Specific location for a specific site.
 	PubDate     int64
@@ -59,6 +60,9 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]Article, error
 		var article Article
 		article.Title = item.Title
 		article.Description = item.Description
+		if site.HasContent {
+			article.Content = item.Content
+		}
 		article.Country = site.Country
 		article.Location = site.Location
 
@@ -79,7 +83,7 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]Article, error
 }
 
 func (a Article) String() string {
-	return fmt.Sprintf("Title: %s, desc: %s, cat: %s", a.Title, a.Description, a.Categories)
+	return fmt.Sprintf("Title: %s, desc: %s, content: %s, cat: %s", a.Title, a.Description, a.Content, a.Description)
 }
 
 // Scanner interface could fetch the data from some file, containing
