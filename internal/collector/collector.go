@@ -12,23 +12,34 @@ import (
 	"time"
 )
 
-// Collector will be in charge of hit the RSS URL, and then, convert to an Article.
+// Collector will be in charge of hit the RSS URL, and then, convert to an RawArticle.
 type Collector interface {
 	// Collect simply return a list of Articles (items in RSS) parsed form a Site. The data is transformed in order
 	// to save it easily in the Database.
-	Collect(s Site) ([]Article, error)
+	Collect(s Site) ([]RawArticle, error)
 }
 
-// Article is the same as we can get in RSS feed.
-type Article struct {
-	ID          string
+// RawArticle is the same as we can get in RSS feed.
+type RawArticle struct {
 	Title       string
 	Description string // is like subtitle
 	Content     string // content is the news itself. Some sites may don't have it.
 	Country     string // ISO code for the country AR, UY, BR...
 	Location    string // Specific location for a specific site.
-	PubDate     int64
+	PubDate     string
 	Categories  []string
+}
+
+// Article is the struct to save in the DB. The categories are curated and we can save them safe.
+type Article struct {
+	ID          int64
+	Title       string
+	Description string
+	Content     string
+	Country     string
+	Location    string
+	PubDate     int64
+	Categories  []int // we have the category ids here.
 }
 
 // RSSCollector the RSS implementation of the Collector interface.
@@ -46,7 +57,7 @@ func NewCollector() *RSSCollector {
 	}
 }
 
-func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]Article, error) {
+func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]RawArticle, error) {
 	_ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 	feed, err := r.Parser.ParseURLWithContext(site.URL, _ctx)
@@ -55,9 +66,9 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]Article, error
 		return nil, fmt.Errorf("cannot parse feed for URL %s - %v", site.URL, err)
 	}
 
-	result := make([]Article, 0, len(feed.Items))
+	result := make([]RawArticle, 0, len(feed.Items))
 	for _, item := range feed.Items {
-		var article Article
+		var article RawArticle
 		article.Title = item.Title
 		article.Description = item.Description
 		if site.HasContent {
@@ -82,7 +93,7 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]Article, error
 	return result, nil
 }
 
-func (a Article) String() string {
+func (a RawArticle) String() string {
 	return fmt.Sprintf("Title: %s, desc: %s, content: %s, cat: %s", a.Title, a.Description, a.Content, a.Description)
 }
 

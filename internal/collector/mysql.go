@@ -2,7 +2,10 @@ package collector
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 type storage struct {
@@ -29,7 +32,24 @@ func newStorage(url string) (*storage, error) {
 }
 
 func (s *storage) saveArticle(a Article) (*Article, error) {
-	//s.Exec("insert into articles values")
+	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?, ?,?,?,?,?,?,?)")
 
-	return nil, nil
+	if err != nil {
+		return nil, fmt.Errorf("cannot save article: %v", err)
+	}
+
+	id, err := res.LastInsertId()
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot get last inserted ID for articles: %v", err)
+	}
+	a.ID = id
+
+	for _, catID := range a.Categories {
+		if _, err := s.Exec("insert into article_categories (article_id, category_id) values (?,?)", a.ID, catID); err != nil {
+			log.Warn().Err(err).Msg("cannot save article_categories")
+		}
+	}
+
+	return &a, nil
 }
