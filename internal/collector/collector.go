@@ -16,7 +16,7 @@ import (
 type Collector interface {
 	// Collect simply return a list of Articles (items in RSS) parsed form a Site. The data is transformed in order
 	// to save it easily in the Database.
-	Collect(s Site) ([]RawArticle, error)
+	Collect(ctx context.Context, s Site) ([]RawArticle, error)
 }
 
 // RawArticle is the same as we can get in RSS feed.
@@ -121,7 +121,7 @@ func NewSiteScanner() *SiteScanner {
 	}
 }
 
-func (s SiteScanner) GetSites() []Site {
+func (s SiteScanner) Scan() []Site {
 	f, err := os.Open(s.file)
 	if err != nil {
 		log.Fatal("unable to read input file "+s.file, err)

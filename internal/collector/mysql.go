@@ -8,6 +8,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type Storage interface {
+	saveArticle(a Article) (*Article, error)
+}
+
 type storage struct {
 	*sql.DB
 }
@@ -32,7 +36,7 @@ func newStorage(url string) (*storage, error) {
 }
 
 func (s *storage) saveArticle(a Article) (*Article, error) {
-	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?, ?,?,?,?,?,?,?)")
+	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?,?,?,?,?,?,?,?)")
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot save article: %v", err)
