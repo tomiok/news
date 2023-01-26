@@ -134,7 +134,7 @@ func (s SiteScanner) Scan() []Site {
 	csvReader := csv.NewReader(f)
 	records, err := csvReader.ReadAll()
 	if err != nil {
-		log.Fatal("Unable to parse file as CSV for "+s.file, err)
+		log.Fatal("unable to parse file as CSV for "+s.file, err)
 	}
 
 	result := make([]Site, 0, len(records))
