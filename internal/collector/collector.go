@@ -16,7 +16,7 @@ import (
 type Collector interface {
 	// Collect simply return a list of Articles (items in RSS) parsed form a Site. The data is transformed in order
 	// to save it easily in the Database.
-	Collect(s Site) ([]RawArticle, error)
+	Collect(ctx context.Context, s Site) ([]RawArticle, error)
 }
 
 // RawArticle is the same as we can get in RSS feed.
@@ -121,7 +121,7 @@ func NewSiteScanner() *SiteScanner {
 	}
 }
 
-func (s SiteScanner) GetSites() []Site {
+func (s SiteScanner) Scan() []Site {
 	f, err := os.Open(s.file)
 	if err != nil {
 		log.Fatal("unable to read input file "+s.file, err)
@@ -134,18 +134,22 @@ func (s SiteScanner) GetSites() []Site {
 	csvReader := csv.NewReader(f)
 	records, err := csvReader.ReadAll()
 	if err != nil {
-		log.Fatal("Unable to parse file as CSV for "+s.file, err)
+		log.Fatal("unable to parse file as CSV for "+s.file, err)
 	}
 
 	result := make([]Site, 0, len(records))
 	for _, lines := range records {
-		b, _ := strconv.ParseBool(lines[2])
+		_url := lines[0]
+		mainCategory := lines[1]
+		hasContent, _ := strconv.ParseBool(lines[2])
+		country := lines[3]
+		location := lines[4]
 		result = append(result, Site{
-			URL:          lines[0],
-			MainCategory: lines[1],
-			HasContent:   b,
-			Country:      lines[3],
-			Location:     lines[4],
+			URL:          _url,
+			MainCategory: mainCategory,
+			HasContent:   hasContent,
+			Country:      country,
+			Location:     location,
 		})
 	}
 
