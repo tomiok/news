@@ -3,9 +3,9 @@ package collector
 import (
 	"database/sql"
 	"fmt"
-	"time"
-
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/zerolog/log"
+	"time"
 )
 
 type Storage interface {

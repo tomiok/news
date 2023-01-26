@@ -3,6 +3,7 @@ module news
 go 1.19
 
 require (
+	github.com/go-sql-driver/mysql v1.7.0
 	github.com/microcosm-cc/bluemonday v1.0.21
 	github.com/mmcdole/gofeed v1.1.3
 	github.com/rs/zerolog v1.28.0
