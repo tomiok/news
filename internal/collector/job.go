@@ -7,6 +7,7 @@ import (
 	"sync"
 )
 
+// Job will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
 type Job interface {
 	Do()
 }

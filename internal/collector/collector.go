@@ -139,13 +139,17 @@ func (s SiteScanner) Scan() []Site {
 
 	result := make([]Site, 0, len(records))
 	for _, lines := range records {
-		b, _ := strconv.ParseBool(lines[2])
+		_url := lines[0]
+		mainCategory := lines[1]
+		hasContent, _ := strconv.ParseBool(lines[2])
+		country := lines[3]
+		location := lines[4]
 		result = append(result, Site{
-			URL:          lines[0],
-			MainCategory: lines[1],
-			HasContent:   b,
-			Country:      lines[3],
-			Location:     lines[4],
+			URL:          _url,
+			MainCategory: mainCategory,
+			HasContent:   hasContent,
+			Country:      country,
+			Location:     location,
 		})
 	}
 
