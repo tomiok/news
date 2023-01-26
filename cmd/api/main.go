@@ -6,8 +6,15 @@ import (
 	"time"
 )
 
+const mysqlURI = "root:root@tcp(localhost:3306)/db"
+
 func main() {
 	now := time.Now()
-	collector.NewJob().Do()
+	job, err := collector.NewJob(mysqlURI)
+	if err != nil {
+		panic(err)
+	}
+
+	job.Do()
 	fmt.Println(time.Since(now))
 }

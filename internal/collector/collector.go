@@ -38,8 +38,13 @@ type Article struct {
 	Content     string
 	Country     string
 	Location    string
-	PubDate     int64
-	Categories  []int // we have the category ids here.
+
+	Lang string
+	Link string
+
+	PubDate int64
+
+	Categories []int // we have the category ids here.
 }
 
 // RSSCollector the RSS implementation of the Collector interface.
