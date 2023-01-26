@@ -19,12 +19,18 @@ type AggregateJob struct {
 	Storage   Storage
 }
 
-func NewJob() *AggregateJob {
+func NewJob(mysqlURI string) (*AggregateJob, error) {
+	storage, err := NewStorage(mysqlURI)
+	if err != nil {
+		return nil, err
+	}
+
 	return &AggregateJob{
 		Collector: NewCollector(),
 		Scanner:   NewSiteScanner(),
 		Sanitizer: NewSanitizer(),
-	}
+		Storage:   storage,
+	}, nil
 }
 
 func (a *AggregateJob) Do() {

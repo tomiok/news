@@ -8,6 +8,7 @@ import (
 
 func main() {
 	now := time.Now()
-	collector.NewJob().Do()
+	job, _ := collector.NewJob("")
+	job.Do()
 	fmt.Println(time.Since(now))
 }

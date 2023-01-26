@@ -12,11 +12,11 @@ type Storage interface {
 	saveArticle(a Article) (*Article, error)
 }
 
-type storage struct {
+type SQLStorage struct {
 	*sql.DB
 }
 
-func newStorage(url string) (*storage, error) {
+func NewStorage(url string) (*SQLStorage, error) {
 	db, err := sql.Open("mysql", url)
 
 	if err != nil {
@@ -30,12 +30,12 @@ func newStorage(url string) (*storage, error) {
 		panic(err)
 	}
 
-	return &storage{
+	return &SQLStorage{
 		DB: db,
 	}, nil
 }
 
-func (s *storage) saveArticle(a Article) (*Article, error) {
+func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?,?,?,?,?,?,?,?)")
 
 	if err != nil {
