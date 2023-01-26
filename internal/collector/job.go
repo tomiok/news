@@ -44,8 +44,8 @@ func (a *AggregateJob) Do() {
 	go a.getRawArticles(chSites, chArticles)
 	go a.Sanitize(chArticles, transformedCh)
 
-	Print(transformedCh)
-	//a.Save(transformedCh)
+	//Print(transformedCh)
+	a.Save(transformedCh)
 }
 
 func (a *AggregateJob) getSites(chSites chan Site) {
@@ -79,6 +79,7 @@ func (a *AggregateJob) Sanitize(articlesCh, out chan RawArticle) {
 	var wg sync.WaitGroup
 	for rawArt := range articlesCh {
 		wg.Add(1)
+
 		title, desc, content := a.Sanitizer.Apply(rawArt.Title, rawArt.Description, rawArt.Content)
 		go func(t, d, c string, rawArt RawArticle) {
 			art := RawArticle{
