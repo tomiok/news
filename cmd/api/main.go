@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-const mysqlURI = "localhost"
+const mysqlURI = "root:root@tcp(localhost:3306)/db"
 
 func main() {
 	now := time.Now()
-	job, err := collector.NewJob("root:root@tcp(localhost:3306)/db")
+	job, err := collector.NewJob(mysqlURI)
 	if err != nil {
 		panic(err)
 	}

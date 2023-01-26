@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+const (
+	maxOpenConnections = 10
+	maxIdleConnections = 10
+)
+
 type Storage interface {
 	saveArticle(a Article) (*Article, error)
 }
@@ -23,8 +28,8 @@ func NewStorage(url string) (*SQLStorage, error) {
 		return nil, err
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(maxOpenConnections)
+	db.SetMaxIdleConns(maxIdleConnections)
 
 	if err = db.Ping(); err != nil {
 		panic(err)
@@ -36,7 +41,8 @@ func NewStorage(url string) (*SQLStorage, error) {
 }
 
 func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
-	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?,?,?,?,?,?,?,?)")
+	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?,?,?,?,?,?,?,?)",
+		a.Title, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.PubDate)
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot save article: %v", err)

@@ -2,9 +2,9 @@ package collector
 
 import (
 	"context"
-	"fmt"
 	"github.com/rs/zerolog/log"
 	"sync"
+	"time"
 )
 
 // Job will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
@@ -42,7 +42,7 @@ func (a *AggregateJob) Do() {
 	go a.getSites(chSites)
 	go a.getRawArticles(chSites, chArticles)
 	go a.Sanitize(chArticles, transformedCh)
-	Print(transformedCh)
+	a.Save(transformedCh)
 }
 
 func (a *AggregateJob) getSites(chSites chan Site) {
@@ -95,8 +95,19 @@ func (a *AggregateJob) Sanitize(articlesCh, out chan RawArticle) {
 	close(out)
 }
 
-func Print(articlesCh chan RawArticle) {
-	for a := range articlesCh {
-		fmt.Println(a.Title)
+func (a *AggregateJob) Save(ch chan RawArticle) {
+	for article := range ch {
+		_, err := a.Storage.saveArticle(Article{
+			Title:       article.Title,
+			Description: article.Description,
+			Content:     article.Content,
+			Country:     article.Country,
+			Location:    article.Location,
+			PubDate:     time.Now().UnixMilli(),
+			Categories:  []int{},
+		})
+		if err != nil {
+			log.Warn().Err(err).Msg("")
+		}
 	}
 }
