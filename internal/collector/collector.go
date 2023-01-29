@@ -12,6 +12,15 @@ import (
 	"time"
 )
 
+const hours24 = 86400000 //24 hours in millis
+
+const rssTimeout = 5 * time.Second
+
+const (
+	countryAR   = "Argentina"
+	langSpanish = "es_AR"
+)
+
 // Collector will be in charge of hit the RSS URL, and then, convert to an RawArticle.
 type Collector interface {
 	// Collect simply return a list of Articles (items in RSS) parsed form a Site. The data is transformed in order
@@ -64,7 +73,9 @@ func NewCollector() *RSSCollector {
 }
 
 func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]RawArticle, error) {
-	_ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	now := time.Now().UnixMilli()
+
+	_ctx, cancel := context.WithTimeout(ctx, rssTimeout)
 	defer cancel()
 	feed, err := r.Parser.ParseURLWithContext(site.URL, _ctx)
 
@@ -101,6 +112,20 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]RawArticle, er
 			continue
 		}
 
+		var published int64
+
+		if publishedAt := item.PublishedParsed; publishedAt != nil {
+			published = publishedAt.UnixMilli()
+		} else {
+			published = time.Now().UnixMilli()
+		}
+
+		// do not save when are older than 24 hours
+		if (now - published) > hours24 {
+			continue
+		}
+
+		article.PubDate = published
 		result = append(result, article)
 	}
 

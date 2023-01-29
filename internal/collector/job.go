@@ -99,6 +99,7 @@ func (a *AggregateJob) Sanitize(articlesCh, out chan RawArticle) {
 }
 
 func (a *AggregateJob) Save(ch chan RawArticle) {
+
 	for article := range ch {
 		_, err := a.Storage.saveArticle(Article{
 			Title:       article.Title,
@@ -107,11 +108,21 @@ func (a *AggregateJob) Save(ch chan RawArticle) {
 			Country:     article.Country,
 			Location:    article.Location,
 			PubDate:     article.PubDate,
+			Lang:        getLang(article.Country)(),
 			Categories:  []int{},
 		})
 		if err != nil {
 			log.Warn().Err(err).Msg("")
 		}
+	}
+}
+
+func getLang(country string) func() string {
+	var m = map[string]string{
+		countryAR: langSpanish,
+	}
+	return func() string {
+		return m[country]
 	}
 }
 
