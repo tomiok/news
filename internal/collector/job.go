@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"sync"
-	"time"
 )
 
 // Job will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
@@ -107,7 +106,7 @@ func (a *AggregateJob) Save(ch chan RawArticle) {
 			Content:     article.Content,
 			Country:     article.Country,
 			Location:    article.Location,
-			PubDate:     time.Now().UnixMilli(),
+			PubDate:     article.PubDate,
 			Categories:  []int{},
 		})
 		if err != nil {

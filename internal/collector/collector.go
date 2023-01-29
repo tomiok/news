@@ -27,7 +27,7 @@ type RawArticle struct {
 	Content     string // content is the news itself. Some sites may don't have it.
 	Country     string // ISO code for the country AR, UY, BR...
 	Location    string // Specific location for a specific site.
-	PubDate     string
+	PubDate     int64
 	Categories  []string
 }
 
