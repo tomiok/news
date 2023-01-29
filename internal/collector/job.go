@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+	"fmt"
 	"github.com/rs/zerolog/log"
 	"sync"
 	"time"
@@ -42,6 +43,8 @@ func (a *AggregateJob) Do() {
 	go a.getSites(chSites)
 	go a.getRawArticles(chSites, chArticles)
 	go a.Sanitize(chArticles, transformedCh)
+
+	//Print(transformedCh)
 	a.Save(transformedCh)
 }
 
@@ -76,6 +79,7 @@ func (a *AggregateJob) Sanitize(articlesCh, out chan RawArticle) {
 	var wg sync.WaitGroup
 	for rawArt := range articlesCh {
 		wg.Add(1)
+
 		title, desc, content := a.Sanitizer.Apply(rawArt.Title, rawArt.Description, rawArt.Content)
 		go func(t, d, c string, rawArt RawArticle) {
 			art := RawArticle{
@@ -109,5 +113,11 @@ func (a *AggregateJob) Save(ch chan RawArticle) {
 		if err != nil {
 			log.Warn().Err(err).Msg("")
 		}
+	}
+}
+
+func Print(ch chan RawArticle) {
+	for article := range ch {
+		fmt.Println(article.Categories)
 	}
 }

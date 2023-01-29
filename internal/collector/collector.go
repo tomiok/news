@@ -21,6 +21,7 @@ type Collector interface {
 
 // RawArticle is the same as we can get in RSS feed.
 type RawArticle struct {
+	HasContent  bool
 	Title       string
 	Description string // is like subtitle
 	Content     string // content is the news itself. Some sites may don't have it.
@@ -75,10 +76,13 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]RawArticle, er
 	for _, item := range feed.Items {
 		var article RawArticle
 		article.Title = item.Title
-		article.Description = item.Description
 		if site.HasContent {
+			article.Description = item.Description
 			article.Content = item.Content
+		} else {
+			article.Content = item.Description
 		}
+
 		article.Country = site.Country
 		article.Location = site.Location
 
@@ -90,6 +94,11 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]RawArticle, er
 			}
 		} else {
 			article.Categories = []string{site.MainCategory}
+		}
+
+		// means that is only a title for RSS. We don't want to save empty content.
+		if article.Content == "" {
+			continue
 		}
 
 		result = append(result, article)
