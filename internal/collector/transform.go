@@ -1,9 +1,10 @@
 package collector
 
 import (
-	"github.com/microcosm-cc/bluemonday"
 	"html"
 	"strings"
+
+	"github.com/microcosm-cc/bluemonday"
 )
 
 // Sanitizer is the key transformation for all the content that will be saved in the database.

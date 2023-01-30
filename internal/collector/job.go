@@ -2,9 +2,9 @@ package collector
 
 import (
 	"context"
-	"fmt"
-	"github.com/rs/zerolog/log"
 	"sync"
+
+	"github.com/rs/zerolog/log"
 )
 
 // Job will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
@@ -38,13 +38,12 @@ func (a *AggregateJob) Do() {
 	chSites := make(chan Site)
 	chArticles := make(chan RawArticle)
 	transformedCh := make(chan RawArticle)
-
+	done := make(chan struct{})
 	go a.getSites(chSites)
 	go a.getRawArticles(chSites, chArticles)
 	go a.Sanitize(chArticles, transformedCh)
-
-	//Print(transformedCh)
-	a.Save(transformedCh)
+	go a.Save(transformedCh, done)
+	<-done
 }
 
 func (a *AggregateJob) getSites(chSites chan Site) {
@@ -98,23 +97,29 @@ func (a *AggregateJob) Sanitize(articlesCh, out chan RawArticle) {
 	close(out)
 }
 
-func (a *AggregateJob) Save(ch chan RawArticle) {
-
+func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
+	var wg sync.WaitGroup
 	for article := range ch {
-		_, err := a.Storage.saveArticle(Article{
-			Title:       article.Title,
-			Description: article.Description,
-			Content:     article.Content,
-			Country:     article.Country,
-			Location:    article.Location,
-			PubDate:     article.PubDate,
-			Lang:        getLang(article.Country)(),
-			Categories:  []int{},
-		})
-		if err != nil {
-			log.Warn().Err(err).Msg("")
-		}
+		wg.Add(1)
+		go func(article RawArticle) {
+			defer wg.Done()
+			_, err := a.Storage.saveArticle(Article{
+				Title:       article.Title,
+				Description: article.Description,
+				Content:     article.Content,
+				Country:     article.Country,
+				Location:    article.Location,
+				PubDate:     article.PubDate,
+				Lang:        getLang(article.Country)(),
+				Categories:  []int{},
+			})
+			if err != nil {
+				log.Warn().Err(err).Msg("")
+			}
+		}(article)
 	}
+	wg.Wait()
+	done <- struct{}{}
 }
 
 func getLang(country string) func() string {
@@ -123,11 +128,5 @@ func getLang(country string) func() string {
 	}
 	return func() string {
 		return m[country]
-	}
-}
-
-func Print(ch chan RawArticle) {
-	for article := range ch {
-		fmt.Println(article.Categories)
 	}
 }

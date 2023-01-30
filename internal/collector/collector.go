@@ -5,11 +5,12 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"github.com/mmcdole/gofeed"
 	"log"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/mmcdole/gofeed"
 )
 
 const hours24 = 86400000 //24 hours in millis
