@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 )
@@ -111,7 +112,8 @@ func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
 				Country:     article.Country,
 				Location:    article.Location,
 				PubDate:     article.PubDate,
-				Lang:        getLang(article.Country)(),
+				SavedAt:     time.Now().UnixMilli(),
+				Lang:        getLang(article.Country),
 				Categories:  []int{},
 			})
 			if err != nil {
@@ -124,13 +126,12 @@ func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
 	done <- struct{}{}
 }
 
-func getLang(country string) func() string {
+func getLang(country string) string {
 	var m = map[string]string{
 		countryAR: langSpanish,
 	}
-	return func() string {
-		return m[country]
-	}
+
+	return m[country]
 }
 
 var _m = sync.Map{}

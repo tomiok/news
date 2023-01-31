@@ -45,6 +45,7 @@ type RawArticle struct {
 // Article is the struct to save in the DB. The categories are curated, and we can save them safe.
 type Article struct {
 	ID          int64
+	UID         string // for link generation proposes.
 	Title       string
 	Description string
 	Content     string
@@ -55,6 +56,7 @@ type Article struct {
 	Link string
 
 	PubDate int64
+	SavedAt int64
 
 	Categories []int // we have the category ids here.
 }
