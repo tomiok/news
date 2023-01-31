@@ -14,18 +14,20 @@ type Sanitizer interface {
 }
 
 type StdSanitize struct {
-	htmlScape func(s string) string
-	Sanitize  func(s string) string
-	TrimSpace func(s string) string
+	htmlScape  func(s string) string
+	Sanitize   func(s string) string
+	TrimSpace  func(s string) string
+	TrimSuffix func(s, char, c string, i int) string
 }
 
 func NewSanitizer() *StdSanitize {
 	p := bluemonday.NewPolicy()
 	p.AllowElements([]string{"h1", "h2", "h3", "h4", "h5", "h6", "div", "span", "hr", "p", "br", "b", "i", "strong", "em", "ol", "ul", "li", "pre", "code", "blockquote", "article", "section"}...)
 	return &StdSanitize{
-		htmlScape: html.UnescapeString,
-		Sanitize:  p.Sanitize,
-		TrimSpace: strings.TrimSpace,
+		htmlScape:  html.UnescapeString,
+		Sanitize:   p.Sanitize,
+		TrimSpace:  strings.TrimSpace,
+		TrimSuffix: strings.Replace,
 	}
 }
 
@@ -42,6 +44,7 @@ func (s *StdSanitize) apply(str string) string {
 		return ""
 	}
 
+	str = s.TrimSuffix(str, "¶", "", -1)
 	str = s.TrimSpace(str)
 	str = s.Sanitize(str)
 	str = s.htmlScape(str)

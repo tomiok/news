@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/rs/zerolog/log"
@@ -116,6 +117,7 @@ func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
 			if err != nil {
 				log.Warn().Err(err).Msg("")
 			}
+			saveCategory(article)
 		}(article)
 	}
 	wg.Wait()
@@ -129,4 +131,19 @@ func getLang(country string) func() string {
 	return func() string {
 		return m[country]
 	}
+}
+
+var _m = sync.Map{}
+
+func saveCategory(article RawArticle) {
+	for _, category := range article.Categories {
+		_m.Store(category, struct{}{})
+	}
+}
+
+func Print() {
+	_m.Range(func(key, value any) bool {
+		fmt.Println(key)
+		return true
+	})
 }

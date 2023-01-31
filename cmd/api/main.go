@@ -16,5 +16,6 @@ func main() {
 	}
 
 	job.Do()
+	collector.Print()
 	fmt.Println(time.Since(now))
 }
