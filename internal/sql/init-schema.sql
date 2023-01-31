@@ -9,6 +9,7 @@ CREATE TABLE articles
     location    VARCHAR(100) NOT NULL,
     lang        VARCHAR(10)  NOT NULL,
     pub_date    BIGINT       NOT NULL,
+    saved_at    BIGINT       NOT NULL,
     PRIMARY KEY (id)
 );
 
