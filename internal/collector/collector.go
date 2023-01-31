@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mmcdole/gofeed"
@@ -41,7 +42,7 @@ type RawArticle struct {
 	Categories  []string
 }
 
-// Article is the struct to save in the DB. The categories are curated and we can save them safe.
+// Article is the struct to save in the DB. The categories are curated, and we can save them safe.
 type Article struct {
 	ID          int64
 	Title       string
@@ -109,7 +110,7 @@ func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]RawArticle, er
 		}
 
 		// means that is only a title for RSS. We don't want to save empty content.
-		if article.Content == "" {
+		if strings.TrimSpace(article.Content) == "" {
 			continue
 		}
 

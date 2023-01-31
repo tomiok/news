@@ -42,9 +42,6 @@ func NewStorage(url string) (*SQLStorage, error) {
 }
 
 func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
-	if a.Content == "" {
-		return nil, nil
-	}
 	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?,?,?,?,?,?,?,?)",
 		a.Title, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.PubDate)
 
