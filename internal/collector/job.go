@@ -3,6 +3,7 @@ package collector
 import (
 	"context"
 	"fmt"
+	"github.com/lithammer/shortuuid/v4"
 	"sync"
 	"time"
 
@@ -46,6 +47,10 @@ func (a *AggregateJob) Do() {
 	go a.Sanitize(chArticles, transformedCh)
 	go a.Save(transformedCh, done)
 	<-done
+}
+
+func (a *AggregateJob) GenerateID() string {
+	return shortuuid.New()
 }
 
 func (a *AggregateJob) getSites(chSites chan Site) {
@@ -107,6 +112,7 @@ func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
 			defer wg.Done()
 			_, err := a.Storage.saveArticle(Article{
 				Title:       article.Title,
+				UID:         a.GenerateID(),
 				Description: article.Description,
 				Content:     article.Content,
 				Country:     article.Country,

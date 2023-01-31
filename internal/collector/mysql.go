@@ -42,8 +42,8 @@ func NewStorage(url string) (*SQLStorage, error) {
 }
 
 func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
-	res, err := s.Exec("insert into articles (title, description, content, link, country, location, lang, pub_date) values (?,?,?,?,?,?,?,?)",
-		a.Title, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.PubDate)
+	res, err := s.Exec("insert into articles (title, uid, description, content, link, country, location, lang, pub_date, saved_at) values (?,?,?,?,?,?,?,?,?,?)",
+		a.Title, a.UID, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.PubDate, a.SavedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot save article: %v", err)
