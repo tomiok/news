@@ -64,3 +64,25 @@ func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 
 	return &a, nil
 }
+
+func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
+	var article Article
+	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.country, a.location, a.lang, a.pub_date from articles a where a.uid=?")
+	err := row.Scan(
+		&article.ID,
+		&article.UID,
+		&article.Title,
+		&article.Description,
+		&article.Content,
+		&article.Country,
+		&article.Location,
+		&article.Lang,
+		&article.PubDate,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("cannot get articles %w", err)
+	}
+
+	return &article, nil
+}

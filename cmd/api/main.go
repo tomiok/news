@@ -10,7 +10,7 @@ const mysqlURI = "root:root@tcp(localhost:3306)/db"
 
 func main() {
 	now := time.Now()
-	job, err := collector.NewJob(mysqlURI)
+	job, err := collector.NewJob("localhost:8080", mysqlURI)
 	if err != nil {
 		panic(err)
 	}

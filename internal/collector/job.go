@@ -20,9 +20,11 @@ type AggregateJob struct {
 	Collector Collector
 	Sanitizer Sanitizer
 	Storage   Storage
+
+	Host string
 }
 
-func NewJob(mysqlURI string) (*AggregateJob, error) {
+func NewJob(host, mysqlURI string) (*AggregateJob, error) {
 	storage, err := NewStorage(mysqlURI)
 	if err != nil {
 		return nil, err
@@ -33,6 +35,7 @@ func NewJob(mysqlURI string) (*AggregateJob, error) {
 		Scanner:   NewSiteScanner(),
 		Sanitizer: NewSanitizer(),
 		Storage:   storage,
+		Host:      host,
 	}, nil
 }
 
@@ -108,16 +111,18 @@ func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
 	var wg sync.WaitGroup
 	for article := range ch {
 		wg.Add(1)
-		go func(article RawArticle) {
+		go func(host string, article RawArticle) {
 			defer wg.Done()
+			uid := a.GenerateID()
 			_, err := a.Storage.saveArticle(Article{
 				Title:       article.Title,
-				UID:         a.GenerateID(),
+				UID:         uid,
 				Description: article.Description,
 				Content:     article.Content,
 				Country:     article.Country,
 				Location:    article.Location,
 				PubDate:     article.PubDate,
+				Link:        createLink(host, uid),
 				SavedAt:     time.Now().UnixMilli(),
 				Lang:        getLang(article.Country),
 				Categories:  []int{},
@@ -126,7 +131,7 @@ func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
 				log.Warn().Err(err).Msg("")
 			}
 			saveCategory(article)
-		}(article)
+		}(a.Host, article)
 	}
 	wg.Wait()
 	done <- struct{}{}
@@ -138,6 +143,11 @@ func getLang(country string) string {
 	}
 
 	return m[country]
+}
+
+func createLink(host, uid string) string {
+	link := fmt.Sprintf("%s/news/%s?permaLink=true", host, uid)
+	return link
 }
 
 var _m = sync.Map{}
