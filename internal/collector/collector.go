@@ -30,6 +30,11 @@ type Collector interface {
 	Collect(ctx context.Context, s Site) ([]RawArticle, error)
 }
 
+// Service is a middleware for web API.
+type Service struct {
+	Storage
+}
+
 // RawArticle is the same as we can get in RSS feed.
 type RawArticle struct {
 	HasContent  bool
@@ -64,6 +69,15 @@ type Article struct {
 // RSSCollector the RSS implementation of the Collector interface.
 type RSSCollector struct {
 	Parser *gofeed.Parser
+}
+
+// NewService is for web API only and returns *Service and an Error.
+func NewService(url string) (*Service, error) {
+	storage := NewStorage(url)
+
+	return &Service{
+		Storage: storage,
+	}, nil
 }
 
 // NewCollector returns a *Collector.

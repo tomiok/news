@@ -16,17 +16,18 @@ const (
 
 type Storage interface {
 	saveArticle(a Article) (*Article, error)
+	getArticleByUID(uid string) (*Article, error)
 }
 
 type SQLStorage struct {
 	*sql.DB
 }
 
-func NewStorage(url string) (*SQLStorage, error) {
+func NewStorage(url string) *SQLStorage {
 	db, err := sql.Open("mysql", url)
 
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(maxOpenConnections)
@@ -38,7 +39,7 @@ func NewStorage(url string) (*SQLStorage, error) {
 
 	return &SQLStorage{
 		DB: db,
-	}, nil
+	}
 }
 
 func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
@@ -67,7 +68,7 @@ func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 
 func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 	var article Article
-	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.country, a.location, a.lang, a.pub_date from articles a where a.uid=?")
+	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.country, a.location, a.lang, a.pub_date from articles a where a.uid=?", uid)
 	err := row.Scan(
 		&article.ID,
 		&article.UID,

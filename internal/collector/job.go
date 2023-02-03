@@ -3,9 +3,10 @@ package collector
 import (
 	"context"
 	"fmt"
-	"github.com/lithammer/shortuuid/v4"
 	"sync"
 	"time"
+
+	"github.com/lithammer/shortuuid/v4"
 
 	"github.com/rs/zerolog/log"
 )
@@ -25,10 +26,7 @@ type AggregateJob struct {
 }
 
 func NewJob(host, mysqlURI string) (*AggregateJob, error) {
-	storage, err := NewStorage(mysqlURI)
-	if err != nil {
-		return nil, err
-	}
+	storage := NewStorage(mysqlURI)
 
 	return &AggregateJob{
 		Collector: NewCollector(),
