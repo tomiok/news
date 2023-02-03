@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"news/internal/collector"
 	"time"
 )
@@ -18,4 +19,18 @@ func main() {
 	job.Do()
 	collector.Print()
 	fmt.Println(time.Since(now))
+}
+
+func run() {
+	srv := &http.Server{
+		Addr: ":" + port,
+		// Good practice to set timeouts to avoid Slowloris attacks.
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      r,
+	}
+
+	server := server{srv}
+	server.Start()
 }
