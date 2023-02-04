@@ -41,3 +41,15 @@ func (s *server) gracefulShutdown() {
 	}
 	log.Info().Msg("server stopped")
 }
+
+type webHandler func(w http.ResponseWriter, r *http.Request) error
+
+func unwrap(f webHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := f(w, r)
+
+		if err != nil {
+			log.Error().Err(err).Msg("cannot process request")
+		}
+	}
+}
