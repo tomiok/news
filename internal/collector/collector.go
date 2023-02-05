@@ -4,6 +4,7 @@ package collector
 import (
 	"context"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -33,6 +34,7 @@ type Collector interface {
 // Service is a middleware for web API.
 type Service struct {
 	Storage
+	views []string
 }
 
 // RawArticle is the same as we can get in RSS feed.
@@ -72,7 +74,11 @@ type RSSCollector struct {
 }
 
 // NewService is for web API only and returns *Service and an Error.
-func NewService(url string) (*Service, error) {
+func NewService(url string, views []string) (*Service, error) {
+	if views == nil || len(views) == 0 {
+		return nil, errors.New("views are nil or empty")
+	}
+
 	storage := NewStorage(url)
 
 	return &Service{

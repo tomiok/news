@@ -12,8 +12,8 @@ type Handler struct {
 	*collector.Service
 }
 
-func New(dbURL string) *Handler {
-	service, err := collector.NewService(dbURL)
+func New(dbURL string, views []string) *Handler {
+	service, err := collector.NewService(dbURL, views)
 
 	if err != nil {
 		return nil
