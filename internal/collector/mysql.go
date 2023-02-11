@@ -94,12 +94,12 @@ func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 const defSize = 50
 
 func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
+	oneDay := time.Now().Add(-time.Hour * 24).UnixMilli()
 	if locations == nil || len(locations) == 0 {
 		return nil, errors.New("locations are nil or empty")
 	}
-
-	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.link, a.country, a.location, a.lang, a.pub_date from articles a where a.location in (?,?) ORDER BY RAND() limit 50",
-		locations[0], locations[1],
+	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.link, a.country, a.location, a.lang, a.pub_date from articles a where a.location in (?,?) and a.pub_date >= ? ORDER BY RAND() limit 50",
+		locations[0], locations[1], oneDay,
 	)
 
 	if err != nil {

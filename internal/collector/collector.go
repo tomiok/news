@@ -50,21 +50,21 @@ type RawArticle struct {
 
 // Article is the struct to save in the DB. The categories are curated, and we can save them safe.
 type Article struct {
-	ID          int64
-	UID         string // for link generation proposes.
-	Title       string
-	Description string
-	Content     string
-	Country     string
-	Location    string
+	ID          int64  `json:"id"`
+	UID         string `json:"-"` // for link generation proposes.
+	Title       string `json:"title"`
+	Description string `json:"description,omitempty"`
+	Content     string `json:"content"`
+	Country     string `json:"country"`
+	Location    string `json:"location"`
 
-	Lang string
-	Link string
+	Lang string `json:"lang"`
+	Link string `json:"link,omitempty"`
 
-	PubDate int64
-	SavedAt int64
+	PubDate int64 `json:"pub_date"`
+	SavedAt int64 `json:"saved_at,omitempty"`
 
-	Categories []int // we have the category ids here.
+	Categories []int `json:"categories,omitempty"` // we have the category ids here.
 }
 
 // RSSCollector the RSS implementation of the Collector interface.
