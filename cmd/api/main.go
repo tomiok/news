@@ -26,13 +26,13 @@ func run() {
 	}
 
 	now := time.Now()
-	job, err := collector.NewJob("", mysqlURI)
+	_, err := collector.NewJob("", mysqlURI)
 	if err != nil {
 		panic(err)
 	}
 
-	job.Do()
-	collector.Print()
+	//job.Do()
+	//collector.Print()
 	fmt.Println(time.Since(now))
 
 	routes(r, deps)
@@ -42,7 +42,9 @@ func run() {
 
 func routes(r *chi.Mux, deps *dependencies) {
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello"))
+		_, _ = w.Write([]byte("hello"))
 	})
+
 	r.Get("/news/{articleUID}", unwrap(deps.collectorHandler.GetNews))
+	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
 }

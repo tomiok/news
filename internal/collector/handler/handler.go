@@ -12,8 +12,8 @@ type Handler struct {
 	*collector.Service
 }
 
-func New(dbURL string, views []string) *Handler {
-	service, err := collector.NewService(dbURL, views)
+func New(dbURL string) *Handler {
+	service, err := collector.NewService(dbURL)
 
 	if err != nil {
 		return nil
@@ -31,4 +31,17 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return web.ResponseOK(w, "news", article)
+}
+
+func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error {
+	l1 := r.URL.Query().Get("l1")
+	l2 := r.URL.Query().Get("l2")
+
+	feed, err := h.Service.GetFeed(l1, l2)
+
+	if err != nil {
+		return err
+	}
+
+	return web.ResponseOK(w, "feed", feed)
 }

@@ -2,6 +2,7 @@ package collector
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -17,6 +18,8 @@ const (
 type Storage interface {
 	saveArticle(a Article) (*Article, error)
 	getArticleByUID(uid string) (*Article, error)
+
+	GetDBFeed(locs ...string) ([]Article, error)
 }
 
 type SQLStorage struct {
@@ -86,4 +89,44 @@ func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 	}
 
 	return &article, nil
+}
+
+const defSize = 50
+
+func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
+	if locations == nil || len(locations) == 0 {
+		return nil, errors.New("locations are nil or empty")
+	}
+
+	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.link, a.country, a.location, a.lang, a.pub_date from articles a where a.location in (?,?) ORDER BY RAND() limit 50",
+		locations[0], locations[1],
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]Article, 0, defSize)
+	for rows.Next() {
+		var article Article
+		err := rows.Scan(
+			&article.ID,
+			&article.UID,
+			&article.Title,
+			&article.Description,
+			&article.Content,
+			&article.Link,
+			&article.Country,
+			&article.Location,
+			&article.Lang,
+			&article.PubDate,
+		)
+		if err != nil {
+			log.Error().Err(err).Msg("cannot read article")
+			continue
+		}
+		result = append(result, article)
+	}
+
+	return result, nil
 }

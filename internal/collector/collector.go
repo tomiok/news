@@ -4,7 +4,6 @@ package collector
 import (
 	"context"
 	"encoding/csv"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -74,11 +73,7 @@ type RSSCollector struct {
 }
 
 // NewService is for web API only and returns *Service and an Error.
-func NewService(url string, views []string) (*Service, error) {
-	if views == nil || len(views) == 0 {
-		return nil, errors.New("views are nil or empty")
-	}
-
+func NewService(url string) (*Service, error) {
 	storage := NewStorage(url)
 
 	return &Service{
