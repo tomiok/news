@@ -14,8 +14,10 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-const hours24 = 86400000 //24 hours in millis
+// hours24, 24 hours in millis.
+const hours24 = 86400000
 
+// rssTimeout wait for RSS that amount of time.
 const rssTimeout = 5 * time.Second
 
 const (
@@ -67,8 +69,8 @@ type Article struct {
 	Categories []int `json:"categories,omitempty"` // we have the category ids here.
 }
 
-// RSSCollector the RSS implementation of the Collector interface.
-type RSSCollector struct {
+// rssCollector the RSS implementation of the Collector interface.
+type rssCollector struct {
 	Parser *gofeed.Parser
 }
 
@@ -81,17 +83,17 @@ func NewService(url string) (*Service, error) {
 	}, nil
 }
 
-// NewCollector returns a *Collector.
-func NewCollector() *RSSCollector {
+// newCollector returns a *Collector.
+func newCollector() *rssCollector {
 	p := gofeed.NewParser()
 	p.UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
 
-	return &RSSCollector{
+	return &rssCollector{
 		Parser: p,
 	}
 }
 
-func (r *RSSCollector) Collect(ctx context.Context, site Site) ([]RawArticle, error) {
+func (r *rssCollector) Collect(ctx context.Context, site Site) ([]RawArticle, error) {
 	now := time.Now().UnixMilli()
 
 	_ctx, cancel := context.WithTimeout(ctx, rssTimeout)
@@ -161,25 +163,27 @@ type Scanner interface {
 	Scan() []Site
 }
 
+// Site is expressed as a website to be scanned. Among the URL, some others values are there to help the collector
+// when grabbing the data.
 type Site struct {
-	URL          string
-	MainCategory string
-	HasContent   bool
-	Country      string
-	Location     string
+	URL          string // the base URL of the RSS.
+	MainCategory string // The main category added if the feed do not provide any other.
+	HasContent   bool   // some RSS do not provide the content. Let's use the Description then.
+	Country      string // Country of the site.
+	Location     string // City or other location (province, state, etc)
 }
 
-type SiteScanner struct {
+type siteScanner struct {
 	file string
 }
 
-func NewSiteScanner() *SiteScanner {
-	return &SiteScanner{
+func newSiteScanner() *siteScanner {
+	return &siteScanner{
 		file: "internal/collector/sites.csv",
 	}
 }
 
-func (s SiteScanner) Scan() []Site {
+func (s siteScanner) Scan() []Site {
 	f, err := os.Open(s.file)
 	if err != nil {
 		log.Fatal("unable to read input file "+s.file, err)

@@ -15,7 +15,7 @@ const (
 )
 
 type dependencies struct {
-	AggregateJob     *collector.AggregateJob
+	AggregateJob     *collector.JobContainer
 	collectorHandler *collectorHandler.Handler
 
 	Port        string

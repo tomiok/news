@@ -11,12 +11,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Job will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
-type Job interface {
+// JobAggregator will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
+type JobAggregator interface {
 	Do()
 }
 
-type AggregateJob struct {
+type JobContainer struct {
 	Scanner   Scanner
 	Collector Collector
 	Sanitizer Sanitizer
@@ -25,19 +25,19 @@ type AggregateJob struct {
 	Host string
 }
 
-func NewJob(host, mysqlURI string) (*AggregateJob, error) {
+func NewJob(host, mysqlURI string) (*JobContainer, error) {
 	storage := NewStorage(mysqlURI)
 
-	return &AggregateJob{
-		Collector: NewCollector(),
-		Scanner:   NewSiteScanner(),
-		Sanitizer: NewSanitizer(),
+	return &JobContainer{
+		Collector: newCollector(),
+		Scanner:   newSiteScanner(),
+		Sanitizer: newSanitizer(),
 		Storage:   storage,
 		Host:      host,
 	}, nil
 }
 
-func (a *AggregateJob) Do() {
+func (a *JobContainer) Do() {
 	// declare channels
 	chSites := make(chan Site)
 	chArticles := make(chan RawArticle)
@@ -50,11 +50,11 @@ func (a *AggregateJob) Do() {
 	<-done
 }
 
-func (a *AggregateJob) GenerateID() string {
+func (a *JobContainer) GenerateID() string {
 	return shortuuid.New()
 }
 
-func (a *AggregateJob) getSites(chSites chan Site) {
+func (a *JobContainer) getSites(chSites chan Site) {
 	sites := a.Scanner.Scan()
 	for _, site := range sites {
 		chSites <- site
@@ -62,7 +62,7 @@ func (a *AggregateJob) getSites(chSites chan Site) {
 	close(chSites)
 }
 
-func (a *AggregateJob) getRawArticles(sitesCh chan Site, articlesCh chan RawArticle) {
+func (a *JobContainer) getRawArticles(sitesCh chan Site, articlesCh chan RawArticle) {
 	var wg sync.WaitGroup
 	for site := range sitesCh {
 		wg.Add(1)
@@ -81,7 +81,7 @@ func (a *AggregateJob) getRawArticles(sitesCh chan Site, articlesCh chan RawArti
 	close(articlesCh)
 }
 
-func (a *AggregateJob) Sanitize(articlesCh, out chan RawArticle) {
+func (a *JobContainer) Sanitize(articlesCh, out chan RawArticle) {
 	var wg sync.WaitGroup
 	for rawArt := range articlesCh {
 		wg.Add(1)
@@ -105,7 +105,7 @@ func (a *AggregateJob) Sanitize(articlesCh, out chan RawArticle) {
 	close(out)
 }
 
-func (a *AggregateJob) Save(ch chan RawArticle, done chan struct{}) {
+func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 	var wg sync.WaitGroup
 	for article := range ch {
 		wg.Add(1)

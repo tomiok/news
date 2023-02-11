@@ -12,7 +12,7 @@ import (
 
 const (
 	maxOpenConnections = 10
-	maxIdleConnections = 10
+	maxIdleConnections
 )
 
 type Storage interface {
@@ -32,6 +32,7 @@ func NewStorage(url string) *SQLStorage {
 	if err != nil {
 		panic(err)
 	}
+
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(maxOpenConnections)
 	db.SetMaxIdleConns(maxIdleConnections)

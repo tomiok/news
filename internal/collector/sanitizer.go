@@ -13,23 +13,23 @@ type Sanitizer interface {
 	Apply(title, desc, content string) (string, string, string)
 }
 
-type StdSanitize struct {
+type stdSanitize struct {
 	htmlScape func(s string) string
 	Sanitize  func(s string) string
 	TrimSpace func(s string) string
 }
 
-func NewSanitizer() *StdSanitize {
+func newSanitizer() *stdSanitize {
 	p := bluemonday.NewPolicy()
 	p.AllowElements([]string{"h1", "h2", "h3", "h4", "h5", "h6", "div", "span", "hr", "p", "br", "b", "i", "strong", "em", "ol", "ul", "li", "pre", "code", "blockquote", "article", "section"}...)
-	return &StdSanitize{
+	return &stdSanitize{
 		htmlScape: html.UnescapeString,
 		Sanitize:  p.Sanitize,
 		TrimSpace: strings.TrimSpace,
 	}
 }
 
-func (s *StdSanitize) Apply(title, desc, content string) (string, string, string) {
+func (s *stdSanitize) Apply(title, desc, content string) (string, string, string) {
 	title = s.apply(title)
 	desc = s.apply(desc)
 	content = s.apply(content)
@@ -37,7 +37,7 @@ func (s *StdSanitize) Apply(title, desc, content string) (string, string, string
 	return title, desc, content
 }
 
-func (s *StdSanitize) apply(str string) string {
+func (s *stdSanitize) apply(str string) string {
 	if str == "" {
 		return ""
 	}
