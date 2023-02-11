@@ -37,7 +37,11 @@ func newDeps() *dependencies {
 		panic(err)
 	}
 
-	_collectorHandler := collectorHandler.New(dbURI)
+	_collectorHandler, err := collectorHandler.New(dbURI)
+
+	if err != nil {
+		panic(err)
+	}
 
 	return &dependencies{
 		AggregateJob:     _job,
