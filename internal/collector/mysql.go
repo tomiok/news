@@ -15,6 +15,7 @@ const (
 	maxIdleConnections
 )
 
+// Storage will interact with the DB.
 type Storage interface {
 	saveArticle(a Article) (*Article, error)
 	getArticleByUID(uid string) (*Article, error)

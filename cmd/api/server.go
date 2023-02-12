@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"news/platform/web"
 	"os"
 	"os/signal"
 	"syscall"
@@ -49,7 +51,10 @@ func unwrap(f webHandler) http.HandlerFunc {
 		err := f(w, r)
 
 		if err != nil {
-			log.Error().Err(err).Msg("cannot process request")
+			requestID := middleware.GetReqID(r.Context())
+			log.Error().Caller(1).Err(err).Str("RequestID", requestID).Msg("cannot process request")
+			web.ResponseInternalError(w, err.Error())
+			return
 		}
 	}
 }
