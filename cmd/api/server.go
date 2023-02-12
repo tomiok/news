@@ -53,7 +53,7 @@ func unwrap(f webHandler) http.HandlerFunc {
 		if err != nil {
 			requestID := middleware.GetReqID(r.Context())
 			log.Error().Caller(1).Err(err).Str("RequestID", requestID).Msg("cannot process request")
-			web.ResponseInternalError(w, err.Error())
+			web.ReturnErr(w, err)
 			return
 		}
 	}

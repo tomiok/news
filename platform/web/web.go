@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -11,31 +12,35 @@ type HttpResponse struct {
 	Success bool        `json:"success"`
 }
 
-func ResponseBadRequest(w http.ResponseWriter, msg string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
-	r, _ := json.Marshal(HttpResponse{
-		Message: msg,
-		Success: false,
-	})
-	_, _ = w.Write(r)
+type Err struct {
+	Message string
+	Code    int
 }
 
-func ResponseInternalError(w http.ResponseWriter, msg string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusInternalServerError)
-	r, _ := json.Marshal(HttpResponse{
-		Message: msg,
-		Success: false,
-	})
-	_, _ = w.Write(r)
+func (e Err) Error() string {
+	return e.Message
 }
 
-func ResponseNotFound(w http.ResponseWriter, msg string) {
+func transform(e error) *Err {
+	var webErr Err
+	if errors.As(e, &webErr) {
+		err := e.(Err)
+		return &err
+	}
+
+	return &Err{
+		Message: "errors during the request",
+		Code:    http.StatusInternalServerError,
+	}
+}
+
+func ReturnErr(w http.ResponseWriter, err error) {
+	_err := transform(err)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusNotFound)
+	w.WriteHeader(_err.Code)
+
 	r, _ := json.Marshal(HttpResponse{
-		Message: msg,
+		Message: _err.Message,
 		Success: false,
 	})
 	_, _ = w.Write(r)

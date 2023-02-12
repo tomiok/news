@@ -29,6 +29,14 @@ func New(dbURL string) (*Handler, error) {
 // An error is returned if the ID is not found.
 func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 	uid := chi.URLParam(r, "articleUID")
+
+	if uid == "" {
+		return web.Err{
+			Message: "uid should be present",
+			Code:    http.StatusBadRequest,
+		}
+	}
+
 	article, err := h.Service.GetNewsByUID(uid)
 
 	if err != nil {
