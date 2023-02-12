@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 	"news/internal/collector"
 	"news/platform/web"
@@ -46,7 +45,7 @@ func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error 
 	l2 := r.URL.Query().Get("l2")
 
 	feed, err := h.Service.GetFeed(l1, l2)
-	err = errors.New("something happened!!!")
+
 	if err != nil {
 		return err
 	}
