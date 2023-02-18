@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
@@ -26,7 +25,6 @@ func run() {
 		Handler:      r,
 	}
 
-	now := time.Now()
 	_, err := collector.NewJob("", mysqlURI)
 	if err != nil {
 		panic(err)
@@ -34,7 +32,7 @@ func run() {
 
 	//job.Do()
 	//collector.Print()
-	fmt.Println(time.Since(now))
+	go collect(deps)
 
 	routes(r, deps)
 	serv := server{Server: srv}
@@ -52,4 +50,14 @@ func routes(r *chi.Mux, deps *dependencies) {
 
 	r.Get("/news/{articleUID}", unwrap(deps.collectorHandler.GetNews))
 	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
+}
+
+func collect(deps *dependencies) {
+	ticker := time.NewTicker(1 * time.Hour)
+	for {
+		select {
+		case <-ticker.C:
+			deps.AggregateJob.Do()
+		}
+	}
 }

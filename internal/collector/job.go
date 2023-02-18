@@ -17,10 +17,10 @@ type JobAggregator interface {
 }
 
 type JobContainer struct {
-	Scanner   Scanner
-	Collector Collector
-	Sanitizer Sanitizer
-	Storage   Storage
+	scanner   Scanner
+	collector Collector
+	sanitizer Sanitizer
+	storage   Storage
 
 	Host string
 }
@@ -29,10 +29,10 @@ func NewJob(host, mysqlURI string) (*JobContainer, error) {
 	storage := NewStorage(mysqlURI)
 
 	return &JobContainer{
-		Collector: newCollector(),
-		Scanner:   newSiteScanner(),
-		Sanitizer: newSanitizer(),
-		Storage:   storage,
+		collector: newCollector(),
+		scanner:   newSiteScanner(),
+		sanitizer: newSanitizer(),
+		storage:   storage,
 		Host:      host,
 	}, nil
 }
@@ -55,7 +55,7 @@ func (a *JobContainer) GenerateID() string {
 }
 
 func (a *JobContainer) getSites(chSites chan Site) {
-	sites := a.Scanner.Scan()
+	sites := a.scanner.Scan()
 	for _, site := range sites {
 		chSites <- site
 	}
@@ -67,7 +67,7 @@ func (a *JobContainer) getRawArticles(sitesCh chan Site, articlesCh chan RawArti
 	for site := range sitesCh {
 		wg.Add(1)
 		go func(site Site) {
-			articles, err := a.Collector.Collect(context.Background(), site)
+			articles, err := a.collector.Collect(context.Background(), site)
 			if err != nil {
 				log.Warn().Err(err).Msgf("cannot found articles for %s", site.URL)
 			}
@@ -86,7 +86,7 @@ func (a *JobContainer) Sanitize(articlesCh, out chan RawArticle) {
 	for rawArt := range articlesCh {
 		wg.Add(1)
 
-		title, desc, content := a.Sanitizer.Apply(rawArt.Title, rawArt.Description, rawArt.Content)
+		title, desc, content := a.sanitizer.Apply(rawArt.Title, rawArt.Description, rawArt.Content)
 		go func(t, d, c string, rawArt RawArticle) {
 			art := RawArticle{
 				Title:       t,
@@ -112,7 +112,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 		go func(host string, article RawArticle) {
 			defer wg.Done()
 			uid := a.GenerateID()
-			_, err := a.Storage.saveArticle(Article{
+			_, err := a.storage.saveArticle(Article{
 				Title:       article.Title,
 				UID:         uid,
 				Description: article.Description,
