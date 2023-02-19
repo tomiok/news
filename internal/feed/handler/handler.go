@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"news/internal/collector"
+	"news/internal/feed"
 	"news/platform/web"
 
 	"github.com/go-chi/chi/v5"
@@ -10,12 +10,12 @@ import (
 
 // Handler will carry the services logic to the web layer.
 type Handler struct {
-	*collector.Service
+	*feed.Service
 }
 
 // New returns a *Handler if the service is created OK, otherwise an error.
 func New(dbURL string) (*Handler, error) {
-	service, err := collector.NewService(dbURL)
+	service, err := feed.NewService(dbURL)
 
 	if err != nil {
 		return nil, err
@@ -52,11 +52,26 @@ func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error 
 	l1 := r.URL.Query().Get("l1")
 	l2 := r.URL.Query().Get("l2")
 
-	feed, err := h.Service.GetFeed(l1, l2)
+	_feed, _, err := h.Service.GetFeed(l1, l2)
 
 	if err != nil {
 		return err
 	}
 
-	return web.ResponseOK(w, "feed", feed)
+	return web.ResponseOK(w, "feed", _feed)
+}
+
+func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
+	l1 := r.URL.Query().Get("l1")
+	l2 := r.URL.Query().Get("l2")
+	articles, locations, err := h.Service.GetFeed(l1, l2)
+	if err != nil {
+		return err
+	}
+
+	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
+		FirstLocation:  locations[0],
+		SecondLocation: locations[1],
+		Articles:       articles,
+	})
 }

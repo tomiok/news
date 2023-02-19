@@ -1,5 +1,5 @@
-// Package collector is the responsible to hit RSS feeds and save into database.
-package collector
+// Package feed is the responsible to hit RSS feeds and save into database.
+package feed
 
 import (
 	"context"

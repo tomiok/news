@@ -1,6 +1,7 @@
 CREATE TABLE articles
 (
     id          INT          NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(100) NOT NULL UNIQUE,
     title       VARCHAR(255) NOT NULL UNIQUE,
     description TEXT         NOT NULL,
     content     TEXT         NOT NULL,
