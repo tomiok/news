@@ -4,7 +4,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
-	"news/internal/collector"
+	"news/internal/feed"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func run() {
 		Handler:      r,
 	}
 
-	_, err := collector.NewJob("", mysqlURI)
+	_, err := feed.NewJob("", mysqlURI)
 	if err != nil {
 		panic(err)
 	}
@@ -50,6 +50,8 @@ func routes(r *chi.Mux, deps *dependencies) {
 
 	r.Get("/news/{articleUID}", unwrap(deps.collectorHandler.GetNews))
 	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
+
+	r.Get("/", unwrap(deps.collectorHandler.Home))
 }
 
 func collect(deps *dependencies) {

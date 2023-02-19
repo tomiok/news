@@ -1,8 +1,8 @@
 package main
 
 import (
-	"news/internal/collector"
-	collectorHandler "news/internal/collector/handler"
+	"news/internal/feed"
+	collectorHandler "news/internal/feed/handler"
 	"os"
 )
 
@@ -10,12 +10,12 @@ const (
 	envLocal  = "local"
 	portLocal = "9000"
 
-	mysqlURI  = "root:root@tcp(localhost:3306)/db"
+	mysqlURI  = "root:@tcp(localhost:3306)/news"
 	localhost = "localhost:" + portLocal
 )
 
 type dependencies struct {
-	AggregateJob     *collector.JobContainer
+	AggregateJob     *feed.JobContainer
 	collectorHandler *collectorHandler.Handler
 
 	Port        string
@@ -31,7 +31,7 @@ func newDeps() *dependencies {
 	host := getVar("HOST", localhost)
 	dbURI := getVar("DB_URI", mysqlURI)
 
-	_job, err := collector.NewJob(host, dbURI)
+	_job, err := feed.NewJob(host, dbURI)
 
 	if err != nil {
 		panic(err)
