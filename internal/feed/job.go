@@ -3,6 +3,7 @@ package feed
 import (
 	"context"
 	"fmt"
+	"github.com/go-sql-driver/mysql"
 	"sync"
 	"time"
 
@@ -62,7 +63,7 @@ func (a *JobContainer) getSites(chSites chan Site) {
 	close(chSites)
 }
 
-func (a *JobContainer) getRawArticles(sitesCh chan Site, articlesCh chan RawArticle) {
+func (a *JobContainer) getRawArticles(sitesCh chan Site, out chan RawArticle) {
 	var wg sync.WaitGroup
 	for site := range sitesCh {
 		wg.Add(1)
@@ -71,25 +72,25 @@ func (a *JobContainer) getRawArticles(sitesCh chan Site, articlesCh chan RawArti
 			articles, err := a.collector.Collect(context.Background(), site)
 			if err != nil {
 				log.Warn().Err(err).Msgf("cannot found articles for %s", site.URL)
-				return
-			}
-			for _, article := range articles {
-				articlesCh <- article
+			} else {
+				for _, article := range articles {
+					out <- article
+				}
 			}
 		}(site)
 	}
 	wg.Wait()
-	close(articlesCh)
+	close(out)
 }
 
 func (a *JobContainer) Sanitize(articlesCh, out chan RawArticle) {
 	var wg sync.WaitGroup
 	for rawArt := range articlesCh {
 		wg.Add(1)
-
 		title, desc, content := a.sanitizer.Apply(rawArt.Title, rawArt.Description, rawArt.Content)
 		go func(t, d, c string, rawArt RawArticle) {
-			art := RawArticle{
+			wg.Done()
+			out <- RawArticle{
 				Title:       t,
 				Description: d,
 				Content:     c,
@@ -98,8 +99,6 @@ func (a *JobContainer) Sanitize(articlesCh, out chan RawArticle) {
 				PubDate:     rawArt.PubDate,
 				Categories:  rawArt.Categories,
 			}
-			out <- art
-			wg.Done()
 		}(title, desc, content, rawArt)
 	}
 	wg.Wait()
@@ -127,7 +126,14 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				Categories:  []int{},
 			})
 			if err != nil {
-				log.Warn().Err(err).Msg("")
+				me, ok := err.(*mysql.MySQLError)
+				if !ok {
+					log.Err(err).Msg("cannot save in database")
+					return
+				}
+				if me.Number != 1062 {
+					log.Warn().Err(err).Msg("")
+				}
 			}
 		}(article)
 	}

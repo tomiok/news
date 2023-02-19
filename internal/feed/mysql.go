@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	maxOpenConnections = 10
+	maxOpenConnections = 100
 	maxIdleConnections
 )
 
@@ -52,13 +52,13 @@ func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 		a.Title, a.UID, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.PubDate, a.SavedAt)
 
 	if err != nil {
-		return nil, fmt.Errorf("cannot save article: %v", err)
+		return nil, err
 	}
 
 	id, err := res.LastInsertId()
 
 	if err != nil {
-		return nil, fmt.Errorf("cannot get last inserted ID for articles: %v", err)
+		return nil, fmt.Errorf("cannot get last inserted ID for articles: %w", err)
 	}
 	a.ID = id
 

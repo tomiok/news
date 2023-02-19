@@ -94,14 +94,17 @@ func newCollector() *rssCollector {
 }
 
 func (r *rssCollector) Collect(ctx context.Context, site Site) ([]RawArticle, error) {
+	defer func() {
+		if rvr:= recover(); rvr != nil {
+			log.Error().Msgf("recovered", rvr)
+		}
+	}()
 	now := time.Now().UnixMilli()
 
-	_ctx, cancel := context.WithTimeout(ctx, rssTimeout)
-	defer cancel()
-	feed, err := r.Parser.ParseURLWithContext(site.URL, _ctx)
+	feed, err := r.Parser.ParseURLWithContext(site.URL, ctx)
 
 	if err != nil {
-		return nil, fmt.Errorf("cannot parse feed for URL %s - %v", site.URL, err)
+		return nil, fmt.Errorf("cannot parse feed for URL %s - %w", site.URL, err)
 	}
 
 	result := make([]RawArticle, 0, len(feed.Items))
