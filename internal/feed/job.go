@@ -67,14 +67,15 @@ func (a *JobContainer) getRawArticles(sitesCh chan Site, articlesCh chan RawArti
 	for site := range sitesCh {
 		wg.Add(1)
 		go func(site Site) {
+			defer wg.Done()
 			articles, err := a.collector.Collect(context.Background(), site)
 			if err != nil {
 				log.Warn().Err(err).Msgf("cannot found articles for %s", site.URL)
+				return
 			}
 			for _, article := range articles {
 				articlesCh <- article
 			}
-			wg.Done()
 		}(site)
 	}
 	wg.Wait()
@@ -109,7 +110,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 	var wg sync.WaitGroup
 	for article := range ch {
 		wg.Add(1)
-		go func(host string, article RawArticle) {
+		go func(article RawArticle) {
 			defer wg.Done()
 			uid := a.GenerateID()
 			_, err := a.storage.saveArticle(Article{
@@ -120,7 +121,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				Country:     article.Country,
 				Location:    article.Location,
 				PubDate:     article.PubDate,
-				Link:        createLink(host, uid),
+				Link:        createLink(uid),
 				SavedAt:     time.Now().UnixMilli(),
 				Lang:        getLang(article.Country),
 				Categories:  []int{},
@@ -128,8 +129,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 			if err != nil {
 				log.Warn().Err(err).Msg("")
 			}
-			saveCategory(article)
-		}(a.Host, article)
+		}(article)
 	}
 	wg.Wait()
 	done <- struct{}{}
@@ -143,22 +143,7 @@ func getLang(country string) string {
 	return m[country]
 }
 
-func createLink(host, uid string) string {
-	link := fmt.Sprintf("%s/news/%s?permaLink=true", host, uid)
+func createLink(uid string) string {
+	link := fmt.Sprintf("/news/%s?permaLink=true", uid)
 	return link
-}
-
-var _m = sync.Map{}
-
-func saveCategory(article RawArticle) {
-	for _, category := range article.Categories {
-		_m.Store(category, struct{}{})
-	}
-}
-
-func Print() {
-	_m.Range(func(key, value any) bool {
-		fmt.Println(key)
-		return true
-	})
 }

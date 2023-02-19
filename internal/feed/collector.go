@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
-	"log"
+	"github.com/rs/zerolog/log"
 	"os"
 	"strconv"
 	"strings"
@@ -179,14 +179,15 @@ type siteScanner struct {
 
 func newSiteScanner() *siteScanner {
 	return &siteScanner{
-		file: "internal/collector/sites.csv",
+		file: "internal/feed/sites.csv",
 	}
 }
 
 func (s siteScanner) Scan() []Site {
 	f, err := os.Open(s.file)
 	if err != nil {
-		log.Fatal("unable to read input file "+s.file, err)
+		log.Err(err).Msg("cannot read file")
+		return nil
 	}
 
 	defer func() {
@@ -196,7 +197,8 @@ func (s siteScanner) Scan() []Site {
 	csvReader := csv.NewReader(f)
 	records, err := csvReader.ReadAll()
 	if err != nil {
-		log.Fatal("unable to parse file as CSV for "+s.file, err)
+		log.Err(err).Msg("cannot read CSV")
+		return nil
 	}
 
 	result := make([]Site, 0, len(records))

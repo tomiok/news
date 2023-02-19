@@ -4,7 +4,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"net/http"
-	"news/internal/feed"
 	"time"
 )
 
@@ -25,13 +24,6 @@ func run() {
 		Handler:      r,
 	}
 
-	_, err := feed.NewJob("", mysqlURI)
-	if err != nil {
-		panic(err)
-	}
-
-	//job.Do()
-	//collector.Print()
 	go collect(deps)
 
 	routes(r, deps)
@@ -55,11 +47,12 @@ func routes(r *chi.Mux, deps *dependencies) {
 }
 
 func collect(deps *dependencies) {
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(10* time.Second)
 	for {
 		select {
 		case <-ticker.C:
 			deps.AggregateJob.Do()
+
 		}
 	}
 }
