@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"html/template"
 	"os"
 	"strconv"
 	"strings"
@@ -16,9 +17,6 @@ import (
 
 // hours24, 24 hours in millis.
 const hours24 = 86400000
-
-// rssTimeout wait for RSS that amount of time.
-const rssTimeout = 5 * time.Second
 
 const (
 	countryAR   = "Argentina"
@@ -52,13 +50,13 @@ type RawArticle struct {
 
 // Article is the struct to save in the DB. The categories are curated, and we can save them safe.
 type Article struct {
-	ID          int64  `json:"id"`
-	UID         string `json:"-"` // for link generation proposes.
-	Title       string `json:"title"`
-	Description string `json:"description,omitempty"`
-	Content     string `json:"content"`
-	Country     string `json:"country"`
-	Location    string `json:"location"`
+	ID          int64         `json:"id"`
+	UID         string        `json:"-"` // for link generation proposes.
+	Title       string        `json:"title"`
+	Description string        `json:"description,omitempty"`
+	Content     template.HTML `json:"content"`
+	Country     string        `json:"country"`
+	Location    string        `json:"location"`
 
 	Lang string `json:"lang"`
 	Link string `json:"link,omitempty"`
@@ -95,7 +93,7 @@ func newCollector() *rssCollector {
 
 func (r *rssCollector) Collect(ctx context.Context, site Site) ([]RawArticle, error) {
 	defer func() {
-		if rvr:= recover(); rvr != nil {
+		if rvr := recover(); rvr != nil {
 			log.Error().Msgf("recovered", rvr)
 		}
 	}()

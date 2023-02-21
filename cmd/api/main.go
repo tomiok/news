@@ -47,12 +47,8 @@ func routes(r *chi.Mux, deps *dependencies) {
 }
 
 func collect(deps *dependencies) {
-	ticker := time.NewTicker(6* time.Second)
-	for {
-		select {
-		case <-ticker.C:
-			deps.AggregateJob.Do()
-
-		}
+	ticker := time.NewTicker(10 * time.Minute)
+	for _ = range ticker.C {
+		deps.AggregateJob.Do()
 	}
 }

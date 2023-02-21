@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-sql-driver/mysql"
+	"html/template"
 	"sync"
 	"time"
 
@@ -116,7 +117,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				Title:       article.Title,
 				UID:         uid,
 				Description: article.Description,
-				Content:     article.Content,
+				Content:     template.HTML(article.Content),
 				Country:     article.Country,
 				Location:    article.Location,
 				PubDate:     article.PubDate,

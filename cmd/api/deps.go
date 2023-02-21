@@ -10,7 +10,7 @@ const (
 	envLocal  = "local"
 	portLocal = "9000"
 
-	mysqlURI  = "root:root@tcp(localhost:3306)/news"
+	mysqlURI  = "root:@tcp(localhost:3306)/news"
 	localhost = "localhost:" + portLocal
 )
 

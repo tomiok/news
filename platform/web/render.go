@@ -7,7 +7,13 @@ import (
 	"path/filepath"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"Cut": Trim,
+}
+
+func Trim(s template.HTML) template.HTML {
+	return s[:90] + "..."
+}
 
 type TemplateData struct {
 	FirstLocation  string
