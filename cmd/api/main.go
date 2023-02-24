@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"time"
 )
@@ -47,8 +48,11 @@ func routes(r *chi.Mux, deps *dependencies) {
 }
 
 func collect(deps *dependencies) {
-	ticker := time.NewTicker(10 * time.Minute)
+	ticker := time.NewTicker(15 * time.Second)
 	for _ = range ticker.C {
+		now := time.Now()
 		deps.AggregateJob.Do()
+		since := time.Since(now)
+		log.Info().Msgf("job duration: %s", since)
 	}
 }

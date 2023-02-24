@@ -21,6 +21,8 @@ type Storage interface {
 	getArticleByUID(uid string) (*Article, error)
 
 	GetDBFeed(locs ...string) ([]Article, error)
+
+	AcquireLock() (*Lock, error)
 }
 
 type SQLStorage struct {
@@ -131,4 +133,44 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	}
 
 	return result, nil
+}
+
+func (s *SQLStorage) AcquireLock() (*Lock, error) {
+	tx, err := s.Begin()
+	if err != nil {
+		return nil, err
+	}
+	res, err := tx.Exec("update feed_lock set is_locked = true where is_locked = false")
+
+	if err != nil {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	count, err := res.RowsAffected()
+
+	if err != nil {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	if count == 0 {
+		return nil, errors.New("already locked")
+	}
+
+	var ts int64
+	err = tx.QueryRow("select timestamp from feed_lock where is_locked=true limit 1").Scan(&ts)
+
+	if err != nil {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	_, err = tx.Exec("update feed_lock set is_locked = false, timestamp = ? where is_locked = true",
+		time.Now().UnixMilli())
+	if err != nil {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	_ = tx.Commit()
+	return &Lock{IsLocked: false, Timestamp: ts}, nil
 }

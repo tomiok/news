@@ -40,6 +40,18 @@ func NewJob(host, mysqlURI string) (*JobContainer, error) {
 }
 
 func (a *JobContainer) Do() {
+	lock, err := a.storage.AcquireLock()
+	if err != nil {
+		log.Warn().Err(err).Msg("collector is locked")
+		return
+	}
+
+	if time.Now().Sub(time.UnixMilli(lock.Timestamp)).Abs() < time.Hour {
+		log.Warn().Msg("last run was less than 1 hour")
+		return
+	}
+
+	log.Info().Msgf("running job: %s", time.UnixMilli(lock.Timestamp))
 	// declare channels
 	chSites := make(chan Site)
 	chArticles := make(chan RawArticle)
@@ -127,9 +139,10 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				Categories:  []int{},
 			})
 			if err != nil {
+				log.Err(err).Msg("cannot save in database")
 				me, ok := err.(*mysql.MySQLError)
 				if !ok {
-					log.Err(err).Msg("cannot save in database")
+
 					return
 				}
 				if me.Number != 1062 {

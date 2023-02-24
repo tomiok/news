@@ -14,6 +14,14 @@ CREATE TABLE articles
     PRIMARY KEY (id)
 );
 
+CREATE TABLE feed_lock
+(
+    id        INT     NOT NULL AUTO_INCREMENT,
+    is_locked TINYINT NOT NULL,
+    timestamp BIGINT  NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE article_categories
 (
     article_id  INT NOT NULL,
