@@ -64,6 +64,15 @@ func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error 
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 	l1 := r.URL.Query().Get("l1")
 	l2 := r.URL.Query().Get("l2")
+
+	if l1 == "" {
+		l1 = feed.Argentina
+	}
+
+	if l2 == "" {
+		l2 = feed.CABA
+	}
+
 	articles, locations, err := h.Service.GetFeed(l1, l2)
 	if err != nil {
 		return err
