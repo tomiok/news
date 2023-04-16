@@ -10,8 +10,7 @@ const (
 	envLocal  = "local"
 	portLocal = "9000"
 
-	mysqlURI  = "root:@tcp(localhost:3306)/news_dev"
-	localhost = "localhost:" + portLocal
+	mysqlURI = "root:@tcp(localhost:3306)/news_dev"
 )
 
 //var connectionDB = fmt.Sprintf("%s:%s@tcp(%s:3306)/news_api_dev", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"))
