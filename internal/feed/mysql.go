@@ -140,6 +140,23 @@ func (s *SQLStorage) AcquireLock() (*Lock, error) {
 	if err != nil {
 		return nil, err
 	}
+	var countID int
+	err = tx.QueryRow("select count(id) from feed_lock").Scan(&countID)
+	if err != nil {
+		return nil, err
+	}
+	if countID == 0 {
+		_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values(?,?)", true, time.Now().UnixMilli())
+		if err != nil {
+			_ = tx.Rollback()
+			return nil, err
+		}
+		_ = tx.Commit()
+		return &Lock{
+			IsLocked:  false,
+			Timestamp: time.Now().Add(-2 * time.Hour).UnixMilli(),
+		}, nil
+	}
 	res, err := tx.Exec("update feed_lock set is_locked = true where is_locked = false")
 
 	if err != nil {

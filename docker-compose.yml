@@ -4,7 +4,6 @@ services:
     image: mysql:8.0.32
     restart: always
     environment:
-      MYSQL_DATABASE: 'news'
       MYSQL_USER: 'news-user'
       MYSQL_PASSWORD: 'tommy'
       MYSQL_ROOT_PASSWORD: 'root'
