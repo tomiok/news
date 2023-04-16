@@ -23,19 +23,14 @@ type JobContainer struct {
 	collector Collector
 	sanitizer Sanitizer
 	storage   Storage
-
-	Host string
 }
 
-func NewJob(host, mysqlURI string) (*JobContainer, error) {
-	storage := NewStorage(mysqlURI)
-
+func NewJob(storage Storage) (*JobContainer, error) {
 	return &JobContainer{
 		collector: newCollector(),
-		scanner:   newSiteScanner(),
+		scanner:   newSiteScanner(storage),
 		sanitizer: newSanitizer(),
 		storage:   storage,
-		Host:      host,
 	}, nil
 }
 

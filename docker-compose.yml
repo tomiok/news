@@ -1,8 +1,9 @@
 version: '3'
 services:
   db:
-    image: mysql:8.0.32
+    image: arm64v8/mysql:oracle
     restart: always
+    command: mysqld --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: news_api_dev

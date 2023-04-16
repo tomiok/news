@@ -51,7 +51,6 @@ COPY --from=builder /etc/group /etc/group
 
 # Copy our static executable
 COPY --from=builder /go/bin/news /go/bin/news
-COPY --from=builder /internal/feed/sites.csv /internal/feed/sites.csv
 
 # Use an unprivileged user.
 USER appuser:appuser

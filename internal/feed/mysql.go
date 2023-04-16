@@ -23,6 +23,8 @@ type Storage interface {
 	GetDBFeed(locs ...string) ([]Article, error)
 
 	AcquireLock() (*Lock, error)
+
+	GetSites() ([]Site, error)
 }
 
 type SQLStorage struct {
@@ -142,20 +144,23 @@ func (s *SQLStorage) AcquireLock() (*Lock, error) {
 	}
 	var countID int
 	err = tx.QueryRow("select count(id) from feed_lock").Scan(&countID)
+
 	if err != nil {
+		_ = tx.Rollback()
 		return nil, err
 	}
+
 	if countID == 0 {
 		_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values(?,?)", true, time.Now().UnixMilli())
 		if err != nil {
 			_ = tx.Rollback()
 			return nil, err
 		}
-		_ = tx.Commit()
+
 		return &Lock{
 			IsLocked:  false,
 			Timestamp: time.Now().Add(-2 * time.Hour).UnixMilli(),
-		}, nil
+		}, tx.Commit()
 	}
 	res, err := tx.Exec("update feed_lock set is_locked = true where is_locked = false")
 
@@ -171,6 +176,7 @@ func (s *SQLStorage) AcquireLock() (*Lock, error) {
 	}
 
 	if count == 0 {
+		_ = tx.Commit()
 		return nil, errors.New("already locked")
 	}
 
@@ -188,6 +194,26 @@ func (s *SQLStorage) AcquireLock() (*Lock, error) {
 		_ = tx.Rollback()
 		return nil, err
 	}
-	_ = tx.Commit()
-	return &Lock{IsLocked: false, Timestamp: ts}, nil
+
+	return &Lock{IsLocked: false, Timestamp: ts}, tx.Commit()
+}
+
+func (s *SQLStorage) GetSites() ([]Site, error) {
+	rows, err := s.Query("select url, category, has_content, country, location from sites")
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result []Site
+	for rows.Next() {
+		var site Site
+		err = rows.Scan(&site.URL, &site.MainCategory, &site.HasContent, &site.Country, &site.Location)
+		if err != nil {
+			log.Error().Err(err)
+		}
+		result = append(result, site)
+	}
+
+	return result, nil
 }

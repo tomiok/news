@@ -3,12 +3,9 @@ package feed
 
 import (
 	"context"
-	"encoding/csv"
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"html/template"
-	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -175,48 +172,20 @@ type Site struct {
 }
 
 type siteScanner struct {
-	file string
+	Storage
 }
 
-func newSiteScanner() *siteScanner {
+func newSiteScanner(storage Storage) *siteScanner {
 	return &siteScanner{
-		file: "internal/feed/sites.csv",
+		Storage: storage,
 	}
 }
 
-func (s siteScanner) Scan() []Site {
-	f, err := os.Open(s.file)
+func (s *siteScanner) Scan() []Site {
+	sites, err := s.Storage.GetSites()
+
 	if err != nil {
-		log.Err(err).Msg("cannot read file")
-		return nil
+		log.Error().Err(err)
 	}
-
-	defer func() {
-		_ = f.Close()
-	}()
-
-	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
-	if err != nil {
-		log.Err(err).Msg("cannot read CSV")
-		return nil
-	}
-
-	result := make([]Site, 0, len(records))
-	for _, lines := range records {
-		_url := lines[0]
-		mainCategory := lines[1]
-		hasContent, _ := strconv.ParseBool(lines[2])
-		country := lines[3]
-		location := lines[4]
-		result = append(result, Site{
-			URL:          _url,
-			MainCategory: mainCategory,
-			HasContent:   hasContent,
-			Country:      country,
-			Location:     location,
-		})
-	}
-
-	return result
+	return sites
 }

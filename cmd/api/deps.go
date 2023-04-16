@@ -10,9 +10,11 @@ const (
 	envLocal  = "local"
 	portLocal = "9000"
 
-	mysqlURI  = "root:root@tcp(localhost:3306)/news_api"
+	mysqlURI  = "root:@tcp(localhost:3306)/news_dev"
 	localhost = "localhost:" + portLocal
 )
+
+// var connectionDB = fmt.Sprintf("%s:%s@tcp(%s:3306)/news_api_dev", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"))
 
 type dependencies struct {
 	AggregateJob     *feed.JobContainer
@@ -27,10 +29,9 @@ type dependencies struct {
 func newDeps() *dependencies {
 	env := getVar("ENV", envLocal)
 	port := getVar("PORT", portLocal)
-	host := getVar("HOST", localhost)
 	dbURI := getVar("DB_URI", mysqlURI)
 
-	_job, err := feed.NewJob(host, dbURI)
+	_job, err := feed.NewJob(feed.NewStorage(dbURI))
 
 	if err != nil {
 		panic(err)
