@@ -22,7 +22,6 @@ type dependencies struct {
 	Environment string // which env is the program running.
 
 	mySqlURI string
-	Host     string
 }
 
 func newDeps() *dependencies {
@@ -49,7 +48,6 @@ func newDeps() *dependencies {
 
 		Environment: env,
 		Port:        port,
-		Host:        host,
 		mySqlURI:    dbURI,
 	}
 }
