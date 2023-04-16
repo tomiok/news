@@ -1,19 +1,29 @@
-version: '3.3'
+version: '3'
 services:
   db:
     image: mysql:8.0.32
     restart: always
     environment:
-      MYSQL_USER: 'news-user'
-      MYSQL_PASSWORD: 'tommy'
-      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: news_api_dev
     ports:
-      - '3306:3306'
-    expose:
-      - '3306'
-      # Where our data will be persisted
+      - "3306:3306"
     volumes:
-      - my-db:/var/lib/mysql
-# Names our volume
+      - ./mysql:/var/lib/mysql
+  app:
+    build: .
+    restart: always
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
 volumes:
-  my-db:
+  mysql:
+networks:
+  my-network:
+    driver: bridge
