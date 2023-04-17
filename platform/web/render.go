@@ -12,7 +12,7 @@ var functions = template.FuncMap{
 }
 
 func Trim(s template.HTML) template.HTML {
-	return s[:90] + "..."
+	return s[:180] + "..."
 }
 
 type TemplateData struct {

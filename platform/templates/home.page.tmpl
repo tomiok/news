@@ -1,21 +1,36 @@
 {{template "base" .}}
+{{define "css"}}
+<link rel="stylesheet" href="static/styles.css"/>
+{{end}}
 {{define "content"}}
-    <div id="top" class="row site">
-        <div class="sm-12 md-12 col">
-            <div class="paper container">
-                <div class="text-center">
-                    <h1>Noticias de las últimas 24 horas</h1>
-                    <h3>Estás leyendo para {{.FirstLocation}} y {{.SecondLocation}}</h3>
+<div class="feed">
+                <div>
+                    <h1 class="title">Noticias de las últimas 24 horas</h1>
+                    <h3 class="subtitle">Estás leyendo para {{.FirstLocation}} y {{.SecondLocation}}</h3>
                 </div>
                 {{range $article := .Articles}}
-                    <div class="paper container margin-bottom-large shadow shadow-hover">
-                        <h4>{{ $article.Title }} </h4>
-                        <h5>{{ $article.Description}}</h5>
-                        <p>{{ $article.Content | Cut}}</p>
-                        <a href="{{$article.Link}}" class="paper-btn paper-btn btn-primary-outline">Ver más</a>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                {{ $article.Title }}
+                            </h2>
+                            <span class="card-time">
+                                hace 20 minutos
+                            </span>
+                        </div>
+                        <div class="card-description">
+                            {{ $article.Description}}
+                        </div>
+                        <div class="card-content">
+                            {{ $article.Content | Cut}}
+                        </div>
+                        <div class="card-category">
+                            #futbol
+                        </div>
+                        <div class="card-actions">
+                            <a href="{{$article.Link}}" class="card-button">Ver más</a>
+                        </div>
                     </div>
                 {{end}}
-            </div>
-        </div>
-    </div>
+</div>
 {{end}}

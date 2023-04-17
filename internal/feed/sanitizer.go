@@ -21,7 +21,7 @@ type stdSanitize struct {
 
 func newSanitizer() *stdSanitize {
 	p := bluemonday.NewPolicy()
-	p.AllowElements([]string{"h1", "h2", "h3", "h4", "h5", "h6", "div", "span", "hr", "p", "br", "b", "i", "strong", "em", "ol", "ul", "li", "pre", "code", "blockquote", "article", "section"}...)
+	p.AllowElements([]string{"h1", "h2", "h3", "h4", "h5", "h6", "div", "span", "hr", "br", "b", "i", "strong", "em", "ol", "ul", "li", "pre", "code", "blockquote", "article", "section"}...)
 	return &stdSanitize{
 		htmlScape: html.UnescapeString,
 		Sanitize:  p.Sanitize,

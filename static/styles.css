@@ -1,0 +1,134 @@
+/* Estilos generales */
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5; /
+}
+
+/* Estilos para el contenedor del feed de noticias */
+.feed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 80%;
+    margin: 0 auto;
+}
+
+/* Estilos para los títulos */
+.title {
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Estilos para los subtítulos */
+.subtitle {
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para las tarjetas de noticias */
+.card {
+    width: 100%;
+    max-width: 85%;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+/* Estilos para el título de la tarjeta de noticias */
+.card-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-right: 10px;
+    width: 80%;
+    font-family: "Open Sans", sans-serif;
+    color: #2d3e50;
+}
+
+/* Estilos para la descripción de la tarjeta de noticias */
+.card-description {
+    font-size: 16px;
+    line-height: 1.1;
+    margin-bottom: 3px;
+    color: #452f2f;
+    font-family: "Open Sans", sans-serif;
+}
+
+/* Estilos para el contenido de la tarjeta de noticias */
+.card-content {
+    padding: 5px;
+    color: #777;
+    margin-bottom: 3px;
+    font-family: "Open Sans", sans-serif;
+}
+
+.card-category {
+    font-size: 14px;
+    color: #65098c;
+    margin: 0 0 10px 0;
+}
+
+.card-time {
+    font-size: 14px;
+    color: #180575;
+    width: 20%;
+    text-align: right;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.card-actions {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilos para el botón de la tarjeta de noticias */
+.card-button {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    background-color: #2d3e50; /* Detalles en azul oscuro */
+    font-family: "Roboto", sans-serif;
+}
+
+/* Estilos para pantallas pequeñas (móviles y tablets) */
+@media screen and (max-width: 768px) {
+    .feed {
+        justify-content: center;
+        padding: 10px 5px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: none;
+        margin-right: 0;
+    }
+}
