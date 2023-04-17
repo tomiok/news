@@ -10,22 +10,24 @@
         </div>
         {{range $article := .Articles}}
             <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        {{ $article.Title }}
-                    </h2>
-                    <span class="card-time">
-                                hace 20 minutos
-                            </span>
-                </div>
+
+                <h2 class="card-title">
+                    {{ $article.Title }}
+                </h2>
+
                 <div class="card-description">
                     {{ $article.Description}}
                 </div>
                 <div class="card-content">
                     {{ $article.Content | Cut}}
                 </div>
-                <div class="card-category">
-                    #futbol
+                <div class="card-footer">
+                    <div class="card-category">
+                        #futbol
+                    </div>
+                    <span class="card-time">
+                    hace 20 minutos
+                </span>
                 </div>
                 <div class="card-actions">
                     <a href="{{$article.Link}}" class="card-button">Ver más</a>
