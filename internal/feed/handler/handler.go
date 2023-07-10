@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"news/internal/feed"
 	"news/platform/web"
@@ -87,6 +88,7 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	fmt.Println(len(articles))
 	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
 		FirstLocation:  locations[0],
 		SecondLocation: locations[1],

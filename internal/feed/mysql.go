@@ -100,7 +100,8 @@ func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 const defSize = 50
 
 func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
-	oneDay := time.Now().Add(-time.Hour * 24).UnixMilli()
+	oneDay := time.Now().Add(-time.Hour * 48).UnixMilli()
+	fmt.Println(oneDay)
 	if locations == nil || len(locations) == 0 {
 		return nil, errors.New("locations are nil or empty")
 	}

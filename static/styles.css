@@ -118,22 +118,17 @@ body {
     background-color: #2d3e50; /* Detalles en azul oscuro */
     font-family: "Roboto", sans-serif;
 }
-
-/* Styles for the form */
-.form {
-    width: 100%;
-    max-width: 400px;
-    margin: 20px auto;
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    box-sizing: border-box;
+form {
+    display: flex;
+    align-items: center;
 }
 
-/* Styles for the text fields */
-.form input[type="text"] {
-    width: 100%;
+form label {
+    margin-right: 10px;
+}
+
+form input[type="text"] {
+    flex: 1;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -143,8 +138,7 @@ body {
     box-sizing: border-box;
 }
 
-/* Styles for the button */
-.form button {
+form button {
     display: inline-block;
     padding: 10px 20px;
     border: none;
@@ -152,11 +146,14 @@ body {
     text-align: center;
     text-decoration: none;
     border-radius: 5px;
-    margin-top: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    margin-left: 10px;
     background-color: #2d3e50; /* Dark blue */
     font-family: "Roboto", sans-serif;
     font-size: 16px;
     cursor: pointer;
+    align-self: flex-start;
 }
 
 
