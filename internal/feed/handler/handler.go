@@ -14,8 +14,8 @@ type Handler struct {
 }
 
 // New returns a *Handler if the service is created OK, otherwise an error.
-func New(dbURL string) (*Handler, error) {
-	service, err := feed.NewService(dbURL)
+func New(storage feed.Storage) (*Handler, error) {
+	service, err := feed.NewService(storage)
 
 	if err != nil {
 		return nil, err
@@ -52,13 +52,22 @@ func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error 
 	l1 := r.URL.Query().Get("l1")
 	l2 := r.URL.Query().Get("l2")
 
-	_feed, _, err := h.Service.GetFeed(l1, l2)
+	_feed, locations, err := h.Service.GetFeed(l1, l2)
 
 	if err != nil {
 		return err
 	}
 
-	return web.ResponseOK(w, "feed", _feed)
+	l := len(locations)
+	for i := 0; i <= 2-l; i++ {
+		locations = append(locations, "CABA")
+	}
+
+	return web.TemplateRender(w, "news.page.tmpl", &web.TemplateData{
+		Articles:       _feed,
+		FirstLocation:  locations[0],
+		SecondLocation: locations[1],
+	})
 }
 
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {

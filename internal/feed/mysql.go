@@ -35,7 +35,7 @@ func NewStorage(url string) *SQLStorage {
 	db, err := sql.Open("mysql", url)
 
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err)
 	}
 
 	db.SetConnMaxLifetime(time.Minute * 3)
@@ -131,6 +131,7 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 			log.Error().Err(err).Msg("cannot read article")
 			continue
 		}
+		article.SinceMinutes()
 		result = append(result, article)
 	}
 

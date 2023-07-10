@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/rs/zerolog/log"
 	"news/internal/feed"
 	collectorHandler "news/internal/feed/handler"
 	"os"
@@ -10,10 +11,10 @@ const (
 	envLocal  = "local"
 	portLocal = "9000"
 
-	mysqlURI = "root:@tcp(localhost:3306)/news_dev"
+	mysqlURI = "root:@tcp(localhost:3306)/news_api_dev"
 )
 
-//var connectionDB = fmt.Sprintf("%s:%s@tcp(%s:3306)/news_api_dev", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"))
+//var connectionDB = fmt.Sprintf("%s:%s@tcp(%s:3306)/news_api_dev?charset=utf8&parseTime=True&loc=Local", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"))
 
 type dependencies struct {
 	AggregateJob     *feed.JobContainer
@@ -30,16 +31,17 @@ func newDeps() *dependencies {
 	port := getVar("PORT", portLocal)
 	dbURI := getVar("DB_URI", mysqlURI)
 
-	_job, err := feed.NewJob(feed.NewStorage(dbURI))
+	_storage := feed.NewStorage(mysqlURI)
+	_job, err := feed.NewJob(_storage)
 
 	if err != nil {
-		panic(err)
+		log.Fatal().Msg(err.Error())
 	}
 
-	_collectorHandler, err := collectorHandler.New(dbURI)
+	_collectorHandler, err := collectorHandler.New(_storage)
 
 	if err != nil {
-		panic(err)
+		log.Fatal().Msg(err.Error())
 	}
 
 	return &dependencies{

@@ -8,31 +8,43 @@
             <h1 class="title">Noticias de las últimas 24 horas</h1>
             <h3 class="subtitle">Estás leyendo para {{.FirstLocation}} y {{.SecondLocation}}</h3>
         </div>
-        {{range $article := .Articles}}
-            <div class="card">
+        <div class="form">
+            <form hx-target="#news" hx-get="/feeds" method="get" xh-swap="outerHTML">
+                <label>
+                    Ciudad 1:<input type="text" name="l1">
+                </label>
+                <label>
+                    Ciudad 2:<input type="text" name="l2">
+                </label>
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
+        <div id="news">
+            {{range $article := .Articles}}
+                <div class="card">
+                    <h2 class="card-title">
+                        {{ $article.Title }}
+                    </h2>
 
-                <h2 class="card-title">
-                    {{ $article.Title }}
-                </h2>
-
-                <div class="card-description">
-                    {{ $article.Description}}
-                </div>
-                <div class="card-content">
-                    {{ $article.Content | Cut}}
-                </div>
-                <div class="card-footer">
-                    <div class="card-category">
-                        #futbol
+                    <div class="card-description">
+                        {{ $article.Description}}
                     </div>
-                    <span class="card-time">
-                    hace 20 minutos
+                    <div class="card-content">
+                        {{ $article.Content | Cut}}
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-category">
+                            {{ $article.Categories }}
+                        </div>
+                        <span class="card-time">
+                        Hace {{$article.Since}} minutos
                 </span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{$article.Link}}" class="card-button">Ver más</a>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <a href="{{$article.Link}}" class="card-button">Ver más</a>
-                </div>
-            </div>
-        {{end}}
+            {{end}}
+        </div>
     </div>
 {{end}}

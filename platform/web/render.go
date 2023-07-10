@@ -12,13 +12,18 @@ var functions = template.FuncMap{
 }
 
 func Trim(s template.HTML) template.HTML {
+	if len(s) < 180 {
+		return s
+	}
 	return s[:180] + "..."
 }
 
 type TemplateData struct {
 	FirstLocation  string
 	SecondLocation string
-	Articles       interface{}
+	Articles       any
+
+	Since int
 }
 
 func TemplateRender(w http.ResponseWriter, tmpl string, td *TemplateData) error {

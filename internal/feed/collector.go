@@ -60,8 +60,13 @@ type Article struct {
 
 	PubDate int64 `json:"pub_date"`
 	SavedAt int64 `json:"saved_at,omitempty"`
+	Since   int   `json:"since"`
 
 	Categories []int `json:"categories,omitempty"` // we have the category ids here.
+}
+
+func (a *Article) SinceMinutes() {
+	a.Since = int(time.Since(time.UnixMilli(a.PubDate)).Minutes())
 }
 
 // rssCollector the RSS implementation of the Collector interface.
@@ -70,9 +75,7 @@ type rssCollector struct {
 }
 
 // NewService is for web API only and returns *Service and an Error.
-func NewService(url string) (*Service, error) {
-	storage := NewStorage(url)
-
+func NewService(storage Storage) (*Service, error) {
 	return &Service{
 		Storage: storage,
 	}, nil

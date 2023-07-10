@@ -1,0 +1,33 @@
+{{template "base" .}}
+{{define "css"}}
+    <link rel="stylesheet" href="/static/styles.css"/>
+{{end}}
+{{define "content"}}
+    <div id="news" class="form">
+        {{range $article := .Articles}}
+            <div class="card">
+                <h2 class="card-title">
+                    {{ $article.Title }}
+                </h2>
+
+                <div class="card-description">
+                    {{ $article.Description}}
+                </div>
+                <div class="card-content">
+                    {{ $article.Content | Cut}}
+                </div>
+                <div class="card-footer">
+                    <div class="card-category">
+                        {{$article.Categories}}
+                    </div>
+                    <span class="card-time">
+                    Hace {{$article.Since}} minutos
+                </span>
+                </div>
+                <div class="card-actions">
+                    <a href="{{$article.Link}}" class="card-button">Ver más</a>
+                </div>
+            </div>
+        {{end}}
+    </div>
+{{end}}

@@ -1,16 +1,17 @@
 version: '3'
 services:
   db:
-    image: arm64v8/mysql:oracle
-    restart: always
-    command: mysqld --default-authentication-plugin=mysql_native_password
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: news_api_dev
+    image: mysql:5.7
+    container_name: db
     ports:
       - "3306:3306"
+    environment:
+      - MYSQL_ROOT_HOST=db
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=news_api_dev
+      - MYSQL_ROOT_PASSWORD=root
     volumes:
-      - ./mysql:/var/lib/mysql
+      - database_mysql:/var/lib/mysql2
   app:
     build: .
     restart: always
@@ -24,7 +25,7 @@ services:
       DB_USER: root
       DB_PASSWORD: root
 volumes:
-  mysql:
+  database_mysql:
 networks:
   my-network:
     driver: bridge

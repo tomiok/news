@@ -45,7 +45,7 @@ func routes(r *chi.Mux, deps *dependencies) {
 	})
 
 	r.Get("/news/{articleUID}", unwrap(deps.collectorHandler.GetNews))
-	//r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
+	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
 
 	r.Get("/", unwrap(deps.collectorHandler.Home))
 
