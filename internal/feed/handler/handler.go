@@ -38,13 +38,13 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	article, err := h.Service.GetNewsByUID(uid)
+	_, err := h.Service.GetNewsByUID(uid)
 
 	if err != nil {
 		return err
 	}
 
-	return web.ResponseOK(w, "news", article)
+	return web.TemplateRender(w, "news.page.tmpl", &web.TemplateData{})
 }
 
 // GetLocationFeed is the main feed service. Will return a fixed number of articles. Locations are needed as query
