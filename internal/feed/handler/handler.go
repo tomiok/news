@@ -64,7 +64,7 @@ func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error 
 		locations = append(locations, "CABA")
 	}
 
-	return web.TemplateRender(w, "news.page.tmpl", &web.TemplateData{
+	return web.TemplateRender(w, "feed.feed.news.page.tmpl", &web.TemplateData{
 		Articles:       _feed,
 		FirstLocation:  locations[0],
 		SecondLocation: locations[1],

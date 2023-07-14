@@ -41,11 +41,11 @@ CREATE TABLE categories
 CREATE TABLE sites
 (
     id          INT          NOT NULL AUTO_INCREMENT,
-    url         varchar(250) NOT NULL,
-    category    varchar(150),
+    url         VARCHAR(250) NOT NULL,
+    category    VARCHAR(150),
     has_content TINYINT,
-    country varchar(150),
-    location varchar(150)
+    country     VARCHAR(150),
+    location    VARCHAR(150)
 );
 
 insert into sites (url, category, has_content, country, location)
@@ -72,11 +72,11 @@ values ('https://www.rosario3.com/rss.html', 'actualidad', false, 'Argentina', '
        ('https://inforama.com.ar/feed/', 'actualidad', true, 'Argentina', 'Catamarca'),
        ('https://www.diarioepoca.com/rss', 'actualidad', true, 'Argentina', 'Corrientes'),
        ('http://vivocomodoro.com.ar/feed/', 'actualidad', true, 'Argentina', 'Comodoro'),
-       ('https://www.eldiario.com.ar/feed/', 'actualidad', true, 'Argentina,''Entre' 'Rios'),
+       ('https://www.eldiario.com.ar/feed/', 'actualidad', true, 'Argentina', 'Entre Rios'),
        ('https://agenciasanluis.com/feed/', 'actualidad', true, 'Argentina', 'San Luis'),
        ('https://www.diariodecuyo.com.ar/rss/rss.xml', 'actualidad', true, 'Argentina', 'San Juan'),
-       ('https://www.lavoz.com.ar/arc/outboundfeeds/feeds/rss/?outputType=xml,actualidad,true', 'Argentina',
+       ('https://www.lavoz.com.ar/arc/outboundfeeds/feeds/rss/?outputType=xml', 'actualidad', true, 'Argentina',
         'Cordoba'),
-       ('https://www.rionegro.com.ar/feed/,actualidad', true, 'Argentina', 'Rio Negro'),
+       ('https://www.rionegro.com.ar/feed/', 'actualidad', true, 'Argentina', 'Rio Negro'),
        ('https://www.eltribuno.com/salta/rss-new/portada.rss', 'actualidad', true, 'Argentina', 'Salta'),
        ('https://www.eltribuno.com/jujuy/rss-new/portada.rss', 'actualidad', true, 'Argentina', 'Jujuy');
