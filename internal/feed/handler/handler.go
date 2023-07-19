@@ -37,13 +37,15 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	_, err := h.Service.GetNewsByUID(uid)
+	article, err := h.Service.GetNewsByUID(uid)
 
 	if err != nil {
 		return err
 	}
 
-	return web.TemplateRender(w, "news.page.tmpl", &web.TemplateData{})
+	return web.TemplateRender(w, "news.page.tmpl", &web.TemplateData{
+		Article: article,
+	})
 }
 
 // GetLocationFeed is the main feed service. Will return a fixed number of articles. Locations are needed as query
@@ -63,7 +65,7 @@ func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error 
 		locations = append(locations, feed.CABA)
 	}
 
-	return web.TemplateRender(w, "feed.feed.news.page.tmpl", &web.TemplateData{
+	return web.TemplateRender(w, "feed.news.page.tmpl", &web.TemplateData{
 		Articles:       _feed,
 		FirstLocation:  locations[0],
 		SecondLocation: locations[1],

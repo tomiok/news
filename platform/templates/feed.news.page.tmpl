@@ -4,6 +4,8 @@
 {{end}}
 {{define "content"}}
     <div id="news">
+        <h1 class="title">Noticias de las últimas 24 horas</h1>
+        <h3 class="subtitle">Estás leyendo para {{.FirstLocation}} y {{.SecondLocation}}</h3>
         {{range $article := .Articles}}
             <div class="card">
                 <h2 class="card-title">
@@ -23,11 +25,12 @@
                     <span class="card-time">
                     Hace {{$article.Since}} minutos
                 </span>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{$article.Link}}" class="card-button">Ver más</a>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <a href="{{$article.Link}}" class="card-button">Ver más</a>
-                </div>
-            </div>
-        {{end}}
+            {{end}}
+        </div>
     </div>
 {{end}}

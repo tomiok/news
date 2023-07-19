@@ -36,11 +36,7 @@ func run() {
 }
 
 func routes(r *chi.Mux, deps *dependencies) {
-	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger)
-
-	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("hello"))
-	})
+	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger, middleware.Heartbeat("/ping"))
 
 	r.Get("/news/{articleUID}", unwrap(deps.collectorHandler.GetNews))
 	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
@@ -51,7 +47,7 @@ func routes(r *chi.Mux, deps *dependencies) {
 }
 
 func collect(deps *dependencies) {
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(1 * time.Minute)
 	for _ = range ticker.C {
 		now := time.Now()
 		deps.AggregateJob.Do()

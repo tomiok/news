@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 	"net/http"
+	"news/internal/feed"
 	"path/filepath"
 )
 
@@ -23,7 +24,8 @@ type TemplateData struct {
 	SecondLocation string
 	Articles       any
 
-	Since int
+	Article *feed.Article
+	Since   int
 }
 
 func TemplateRender(w http.ResponseWriter, tmpl string, td *TemplateData) error {
