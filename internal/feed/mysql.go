@@ -43,7 +43,7 @@ func NewStorage(url string) *SQLStorage {
 	db.SetMaxIdleConns(maxIdleConnections)
 
 	if err = db.Ping(); err != nil {
-		panic(err)
+		//panic(err)
 	}
 
 	return &SQLStorage{
