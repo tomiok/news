@@ -45,7 +45,8 @@ CREATE TABLE sites
     category    VARCHAR(150),
     has_content TINYINT,
     country     VARCHAR(150),
-    location    VARCHAR(150)
+    location    VARCHAR(150),
+    PRIMARY KEY (id)
 );
 
 insert into sites (url, category, has_content, country, location)

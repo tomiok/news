@@ -14,16 +14,12 @@ const (
 	mysqlURI = "tomi:tomi@tcp(localhost:3306)/news_api_dev"
 )
 
-//var connectionDB = fmt.Sprintf("%s:%s@tcp(%s:3306)/news_api_dev?charset=utf8&parseTime=True&loc=Local", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"))
-
 type dependencies struct {
 	AggregateJob     *feed.JobContainer
 	collectorHandler *collectorHandler.Handler
 
 	Port        string
 	Environment string // which env is the program running.
-
-	mySqlURI string
 }
 
 func newDeps() *dependencies {
@@ -31,7 +27,7 @@ func newDeps() *dependencies {
 	port := getVar("PORT", portLocal)
 	dbURI := getVar("DB_URI", mysqlURI)
 
-	_storage := feed.NewStorage(mysqlURI)
+	_storage := feed.NewStorage(dbURI)
 	_job, err := feed.NewJob(_storage)
 
 	if err != nil {
@@ -50,7 +46,6 @@ func newDeps() *dependencies {
 
 		Environment: env,
 		Port:        port,
-		mySqlURI:    dbURI,
 	}
 }
 
