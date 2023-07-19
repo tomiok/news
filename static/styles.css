@@ -169,4 +169,25 @@ form button {
         max-width: none;
         margin-right: 0;
     }
+
+    form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    form label {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+
+    form input[type="text"] {
+        margin-bottom: 5px;
+    }
+
+    form button {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        margin-left: 0;
+        align-self: stretch;
+    }
 }
