@@ -2,6 +2,7 @@
   "id": "/?source=pwa",
   "name": "Tu web de noticias",
   "short_name": "web6AM",
+  "description": "Las noticias de todos, en un solo lugar",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#3367D6",
