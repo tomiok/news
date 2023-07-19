@@ -13,6 +13,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Lock is a mechanism to run only once the Job that get the feeds and save it in the database.
+type Lock struct {
+	IsLocked  bool
+	Timestamp int64
+}
+
 // JobAggregator will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
 type JobAggregator interface {
 	Do()
