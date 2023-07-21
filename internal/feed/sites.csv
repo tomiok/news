@@ -28,3 +28,21 @@ insert into site (url, category, has_content, country, location) values
 ('https://www.rionegro.com.ar/feed/,actualidad,true,Argentina,''Rio' 'Negro'),
 ('https://www.eltribuno.com/salta/rss-new/portada.rss,actualidad,true','Argentina','Salta'),
 ('https://www.eltribuno.com/jujuy/rss-new/portada.rss,actualidad,'true','Argentina','Jujuy'))
+
+"Rosario",
+"Argentina",`
+"Entre Rios",`
+"Cordoba",`
+"MDQ",`
+"Rio Negro",`
+"Corrientes",`
+"San Luis",`
+"San Juan",`
+"Comodoro",`
+"Salta",`
+"CABA",`
+"La Plata",`
+"Jujuy",`
+"Quilmes",`
+"Bahia Blanca",`
+"Catamarca",`
