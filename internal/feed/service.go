@@ -1,24 +1,5 @@
 package feed
 
-var __locs = []string{"Rosario",
-	"Argentina",
-	"Entre Rios",
-	"Cordoba",
-	"MDQ",
-	"Rio Negro",
-	"Corrientes",
-	"San Luis",
-	"San Juan",
-	"Comodoro",
-	"Salta",
-	"CABA",
-	"La Plata",
-	"Jujuy",
-	"Quilmes",
-	"Bahia Blanca",
-	"Catamarca",
-}
-
 const (
 	Argentina = "Argentina"
 	CABA      = "CABA"
