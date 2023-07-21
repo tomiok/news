@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
@@ -36,7 +37,7 @@ func run() {
 }
 
 func routes(r *chi.Mux, deps *dependencies) {
-	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger, middleware.Heartbeat("/ping"))
+	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger, putCors(), middleware.Heartbeat("/ping"))
 
 	r.Get("/news/{articleUID}", unwrap(deps.collectorHandler.GetNews))
 	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
@@ -80,5 +81,15 @@ func fs(r chi.Router, path string, root http.FileSystem) {
 		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
 		fs := http.StripPrefix(pathPrefix, http.FileServer(root))
 		fs.ServeHTTP(w, r)
+	})
+}
+
+func putCors() func(http.Handler) http.Handler {
+	return cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://web6am.com"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: false,
+		MaxAge:           500,
 	})
 }
