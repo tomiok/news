@@ -58,15 +58,26 @@ type Article struct {
 	Lang string `json:"lang"`
 	Link string `json:"link,omitempty"`
 
-	PubDate int64 `json:"pub_date"`
-	SavedAt int64 `json:"saved_at,omitempty"`
-	Since   int   `json:"since"`
+	PubDate int64  `json:"pub_date"`
+	SavedAt int64  `json:"saved_at,omitempty"`
+	Since   string `json:"since"`
 
 	Categories []int `json:"categories,omitempty"` // we have the category ids here.
 }
 
 func (a *Article) SinceMinutes() {
-	a.Since = int(time.Since(time.UnixMilli(a.PubDate)).Minutes())
+	minutes := int(time.Since(time.UnixMilli(a.PubDate)).Minutes())
+
+	if minutes <= 60 {
+		a.Since = fmt.Sprintf("hace %d minutos", minutes)
+	} else {
+		hours := minutes / 60
+		if hours == 1 {
+			a.Since = "hace 1 hora"
+		} else {
+			a.Since = fmt.Sprintf("hace %d horas", hours)
+		}
+	}
 }
 
 // rssCollector the RSS implementation of the Collector interface.
