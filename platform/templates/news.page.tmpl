@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="/static/styles.css"/>
 {{end}}
 {{define "content"}}
-    <div class="single-news">
+    <article class="single-news">
         {{$article := .Article}}
         <h2>
             {{ $article.Title }}
@@ -14,5 +14,5 @@
         <div>
             {{ $article.Content}}
         </div>
-    </div>
+    </article>
 {{end}}
