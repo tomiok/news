@@ -43,7 +43,7 @@ func NewStorage(url string) *SQLStorage {
 	db.SetMaxIdleConns(maxIdleConnections)
 
 	if err = db.Ping(); err != nil {
-		//panic(err)
+		panic(err)
 	}
 
 	return &SQLStorage{
@@ -101,7 +101,6 @@ const defSize = 50
 
 func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	oneDay := time.Now().Add(-time.Hour * 48).UnixMilli()
-	fmt.Println(oneDay)
 	if locations == nil || len(locations) == 0 {
 		return nil, errors.New("locations are nil or empty")
 	}

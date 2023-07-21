@@ -141,13 +141,9 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 			})
 			if err != nil {
 				log.Err(err).Msg("cannot save in database")
-				me, ok := err.(*mysql.MySQLError)
+				_, ok := err.(*mysql.MySQLError)
 				if !ok {
-
 					return
-				}
-				if me.Number != 1062 {
-					log.Warn().Err(err).Msg("")
 				}
 			}
 		}(article)
