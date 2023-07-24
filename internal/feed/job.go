@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-sql-driver/mysql"
+	"github.com/gosimple/slug"
 	"html/template"
 	"sync"
 	"time"
@@ -134,7 +135,8 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				Country:     article.Country,
 				Location:    article.Location,
 				PubDate:     article.PubDate,
-				Link:        createLink(uid),
+				Link:        createLink(article.Title, uid),
+				Source:      article.Source,
 				SavedAt:     time.Now().UnixMilli(),
 				Lang:        getLang(article.Country),
 				Categories:  []int{},
@@ -159,7 +161,7 @@ func getLang(country string) string {
 	return m[country]
 }
 
-func createLink(uid string) string {
-	link := fmt.Sprintf("/news/%s?permaLink=true", uid)
+func createLink(title, uid string) string {
+	link := fmt.Sprintf("/news/%s/%s?permaLink=true", slug.MakeLang(title, "es"), uid)
 	return link
 }
