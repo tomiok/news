@@ -41,6 +41,7 @@ type RawArticle struct {
 	Content     string // content is the news itself. Some sites may don't have it.
 	Country     string // ISO code for the country AR, UY, BR...
 	Location    string // Specific location for a specific site.
+	Source      string // add the actual web portal.
 	PubDate     int64
 	Categories  []string
 }
@@ -54,6 +55,7 @@ type Article struct {
 	Content     template.HTML `json:"content"`
 	Country     string        `json:"country"`
 	Location    string        `json:"location"`
+	Source      string        `json:"-"`
 
 	Lang string `json:"lang"`
 	Link string `json:"link,omitempty"`
@@ -129,7 +131,7 @@ func (r *rssCollector) Collect(ctx context.Context, site Site) ([]RawArticle, er
 
 		article.Country = site.Country
 		article.Location = site.Location
-
+		article.Source = site.URL
 		if len(item.Categories) > 0 { // could be with 1 but still empty
 			if item.Categories[0] != "" {
 				article.Categories = item.Categories

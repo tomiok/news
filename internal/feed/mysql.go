@@ -52,8 +52,8 @@ func NewStorage(url string) *SQLStorage {
 }
 
 func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
-	res, err := s.Exec("insert into articles (title, uid, description, content, link, country, location, lang, pub_date, saved_at) values (?,?,?,?,?,?,?,?,?,?)",
-		a.Title, a.UID, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.PubDate, a.SavedAt)
+	res, err := s.Exec("insert into articles (title, uid, description, content, link, country, location, lang, source, pub_date, saved_at) values (?,?,?,?,?,?,?,?,?,?,?)",
+		a.Title, a.UID, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.Source, a.PubDate, a.SavedAt)
 
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 
 func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 	var article Article
-	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.country, a.location, a.lang, a.pub_date from articles a where a.uid=?", uid)
+	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.country, a.location, a.lang, a.source, a.pub_date from articles a where a.uid=?", uid)
 	err := row.Scan(
 		&article.ID,
 		&article.UID,
@@ -87,6 +87,7 @@ func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 		&article.Country,
 		&article.Location,
 		&article.Lang,
+		&article.Source,
 		&article.PubDate,
 	)
 
