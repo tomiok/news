@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/arl/statsviz"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -20,6 +21,7 @@ func run() {
 	deps := newDeps()
 
 	r := chi.NewRouter()
+
 	srv := &http.Server{
 		Addr: ":" + deps.Port,
 		// Good practice to set timeouts to avoid Slowloris attacks.
@@ -37,13 +39,22 @@ func run() {
 }
 
 func routes(r *chi.Mux, deps *dependencies) {
-	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger, putCors(), middleware.Heartbeat("/ping"))
+	r.Use(middleware.RequestID, middleware.Logger, middleware.Recoverer, putCors(), middleware.Heartbeat("/ping"))
 
 	r.Get("/news/{slug}/{articleUID}", unwrap(deps.collectorHandler.GetNews))
 	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
 
 	r.Get("/", unwrap(deps.collectorHandler.Home))
 
+	r.Get("/debug/statsviz/ws", statsviz.Ws)
+	r.Get("/debug/statsviz", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/debug/statsviz/", http.StatusMovedPermanently)
+	})
+	r.Handle("/debug/statsviz/*", basicAuth(statsviz.Index, os.Getenv("STATSUSER"), os.Getenv("STATSTEST"), os.Getenv("REALM")))
+
+	r.HandleFunc("/pprof", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, r.RequestURI+"/", http.StatusMovedPermanently)
+	})
 	fileServer(r)
 }
 
@@ -92,4 +103,17 @@ func putCors() func(http.Handler) http.Handler {
 		AllowCredentials: false,
 		MaxAge:           500,
 	})
+}
+
+func basicAuth(h http.HandlerFunc, user, pwd, realm string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if u, p, ok := r.BasicAuth(); !ok || user != u || pwd != p {
+			w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
+			w.WriteHeader(401)
+			_, _ = w.Write([]byte("Unauthorised.\n"))
+			return
+		}
+
+		h(w, r)
+	}
 }
