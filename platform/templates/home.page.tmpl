@@ -23,7 +23,6 @@
                     <h2 class="card-title">
                         {{ $article.Title }}
                     </h2>
-
                     <div class="card-description">
                         {{ $article.Description}}
                     </div>
@@ -39,7 +38,7 @@
                 </span>
                     </div>
                     <div class="card-actions">
-                        <a href="{{$article.Link}}" class="card-button">Ver más</a>
+                        <a href="/{{$article.Title | MakeSlug}}/{{$article.UID}}" class="card-button">Ver más</a>
                     </div>
                 </div>
             {{end}}
