@@ -25,7 +25,7 @@ func New(storage feed.Storage) (*Handler, error) {
 }
 
 // GetNews is a web handler that will return a news by the UID, provided in the path param.
-// I.E. /news/i2W6uBcVvyDPiSCn4iMo8G
+// I.E. /news/some-title-here/i2W6uBcVvyDPiSCn4iMo8G
 // An error is returned if the ID is not found.
 func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 	uid := chi.URLParam(r, "articleUID")

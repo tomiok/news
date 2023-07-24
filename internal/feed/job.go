@@ -162,6 +162,5 @@ func getLang(country string) string {
 }
 
 func createLink(title, uid string) string {
-	link := fmt.Sprintf("/news/%s/%s?permaLink=true", slug.MakeLang(title, "es"), uid)
-	return link
+	return fmt.Sprintf("/news/%s/%s?permaLink=true", slug.MakeLang(title, "es"), uid)
 }

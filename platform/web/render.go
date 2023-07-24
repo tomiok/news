@@ -2,6 +2,7 @@ package web
 
 import (
 	"bytes"
+	"github.com/gosimple/slug"
 	"html/template"
 	"net/http"
 	"news/internal/feed"
@@ -9,14 +10,19 @@ import (
 )
 
 var functions = template.FuncMap{
-	"Cut": Trim,
+	"Cut":      Trim,
+	"MakeSlug": MakeSlug,
+}
+
+func MakeSlug(title string) string {
+	return slug.MakeLang(title, "es")
 }
 
 func Trim(s template.HTML) template.HTML {
-	if len(s) < 180 {
+	if len(s) < 150 {
 		return s
 	}
-	return s[:180] + "..."
+	return s[:150] + "..."
 }
 
 type TemplateData struct {
