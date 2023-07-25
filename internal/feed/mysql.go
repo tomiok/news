@@ -12,7 +12,7 @@ import (
 
 const (
 	maxOpenConnections = 100
-	maxIdleConnections
+	maxIdleConnections = 0
 )
 
 // Storage will interact with the DB.
