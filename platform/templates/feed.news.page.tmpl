@@ -24,12 +24,11 @@
                     <span class="card-time">
                     {{$article.Since}}
                 </span>
-                    </div>
-                    <div class="card-actions">
-                        <a href="/news/{{$article.Title | MakeSlug}}/{{$article.UID}}" class="card-button">Ver más</a>
-                    </div>
                 </div>
-            {{end}}
-        </div>
+                <div class="card-actions">
+                    <a href="/news/{{$article.Title | MakeSlug}}/{{$article.UID}}" class="card-button">Ver más</a>
+                </div>
+            </div>
+        {{end}}
     </div>
 {{end}}
