@@ -11,17 +11,21 @@ import (
 // Handler will carry the services logic to the web layer.
 type Handler struct {
 	*feed.Service
+	Cache bool
 }
 
 // New returns a *Handler if the service is created OK, otherwise an error.
-func New(storage feed.Storage) (*Handler, error) {
+func New(storage feed.Storage, cache bool) (*Handler, error) {
 	service, err := feed.NewService(storage)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &Handler{Service: service}, nil
+	return &Handler{
+		Service: service,
+		Cache:   cache,
+	}, nil
 }
 
 // GetNews is a web handler that will return a news by the UID, provided in the path param.
@@ -45,7 +49,7 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 
 	return web.TemplateRender(w, "news.page.tmpl", &web.TemplateData{
 		Article: article,
-	})
+	}, h.Cache)
 }
 
 // GetLocationFeed is the main feed service. Will return a fixed number of articles. Locations are needed as query
@@ -69,7 +73,7 @@ func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error 
 		Articles:       _feed,
 		FirstLocation:  locations[0],
 		SecondLocation: locations[1],
-	})
+	}, h.Cache)
 }
 
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
@@ -93,5 +97,5 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 		FirstLocation:  locations[0],
 		SecondLocation: locations[1],
 		Articles:       articles,
-	})
+	}, h.Cache)
 }

@@ -2,6 +2,7 @@ package web
 
 import (
 	"bytes"
+	"errors"
 	"github.com/gosimple/slug"
 	"html/template"
 	"net/http"
@@ -34,14 +35,24 @@ type TemplateData struct {
 	Since   int
 }
 
-func TemplateRender(w http.ResponseWriter, tmpl string, td *TemplateData) error {
+var templates = make(map[string]*template.Template)
+
+func TemplateRender(w http.ResponseWriter, tmpl string, td *TemplateData, isCached bool) error {
 	var t *template.Template
-	if false {
-		//	var ok = true
-		//	t, ok = AppCfg.Cache[tmpl]
-		//	if !ok {
-		//		log.Fatal().Msg("cache is not working")
-		//	}
+	var err error
+	var ok bool
+	if isCached {
+		if len(templates) == 0 {
+			templates, err = TemplateRenderCache()
+			if err != nil {
+				return err
+			}
+		}
+
+		t, ok = templates[tmpl]
+		if !ok {
+			return errors.New("cache is not available, turn flag to false")
+		}
 	} else {
 		cache, err := TemplateRenderCache()
 
@@ -53,7 +64,7 @@ func TemplateRender(w http.ResponseWriter, tmpl string, td *TemplateData) error 
 	}
 
 	buf := new(bytes.Buffer)
-	err := t.Execute(buf, td)
+	err = t.Execute(buf, td)
 
 	if err != nil {
 		return err
