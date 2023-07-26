@@ -40,7 +40,6 @@ func routes(r *chi.Mux, deps *dependencies) {
 	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger, putCors(), middleware.Heartbeat("/ping"))
 
 	r.Get("/news/{slug}/{articleUID}", unwrap(deps.collectorHandler.GetNews))
-	r.Get("/feeds", unwrap(deps.collectorHandler.GetLocationFeed))
 
 	r.Get("/", unwrap(deps.collectorHandler.Home))
 

@@ -17,16 +17,12 @@ func (s *Service) GetNewsByUID(uid string) (*Article, error) {
 }
 
 // GetFeed will return a slice of articles. A pair of locations will be given, if is empty, a default one will be added.
-func (s *Service) GetFeed(locations ...string) ([]Article, []string, error) {
-	if locations == nil || len(locations) == 0 || len(locations) != 2 {
-		locations = []string{Argentina, CABA}
-	}
-
+func (s *Service) GetFeed(locations ...string) ([]Article, error) {
 	feed, err := s.Storage.GetDBFeed(locations...)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return feed, locations, nil
+	return feed, nil
 }

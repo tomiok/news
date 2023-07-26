@@ -52,30 +52,6 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 	}, h.Cache)
 }
 
-// GetLocationFeed is the main feed service. Will return a fixed number of articles. Locations are needed as query
-// params in l1 and l2. If those are not provided, default ones are added.
-func (h *Handler) GetLocationFeed(w http.ResponseWriter, r *http.Request) error {
-	l1 := r.URL.Query().Get("l1")
-	l2 := r.URL.Query().Get("l2")
-
-	_feed, locations, err := h.Service.GetFeed(l1, l2)
-
-	if err != nil {
-		return err
-	}
-
-	l := len(locations)
-	for i := 0; i <= 2-l; i++ {
-		locations = append(locations, feed.CABA)
-	}
-
-	return web.TemplateRender(w, "feed.news.page.tmpl", &web.TemplateData{
-		Articles:       _feed,
-		FirstLocation:  locations[0],
-		SecondLocation: locations[1],
-	}, h.Cache)
-}
-
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 	l1 := r.URL.Query().Get("l1")
 	l2 := r.URL.Query().Get("l2")
@@ -88,14 +64,14 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 		l2 = feed.CABA
 	}
 
-	articles, locations, err := h.Service.GetFeed(l1, l2)
+	articles, err := h.Service.GetFeed(l1, l2)
 	if err != nil {
 		return err
 	}
 
 	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
-		FirstLocation:  locations[0],
-		SecondLocation: locations[1],
+		FirstLocation:  l1,
+		SecondLocation: l2,
 		Articles:       articles,
 	}, h.Cache)
 }

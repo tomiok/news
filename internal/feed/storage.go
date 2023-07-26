@@ -116,7 +116,7 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	result := make([]Article, 0, defSize)
 	for rows.Next() {
 		var article Article
-		err := rows.Scan(
+		err = rows.Scan(
 			&article.ID,
 			&article.UID,
 			&article.Title,
