@@ -1,7 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Noticia+Text&display=swap');
-/* Estilos generales */
+/* general styles */
 body {
-    font-family: "Open Sans", sans-serif;
+    font-family: 'Noticia Text', serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -12,7 +11,7 @@ body {
     background-color: #f5f5f5;/
 }
 
-/* Estilos para el contenedor del feed de noticias */
+/* Container and news */
 .feed {
     position: relative;
     display: flex;
@@ -24,7 +23,7 @@ body {
     margin: 0 auto;
 }
 
-/* Estilos para los títulos */
+/* titles */
 .title {
     width: 100%;
     text-align: center;
@@ -34,7 +33,7 @@ body {
     margin-bottom: 10px;
 }
 
-/* Estilos para los subtítulos */
+/* subtitles */
 .subtitle {
     width: 100%;
     text-align: center;
@@ -42,41 +41,39 @@ body {
     margin-bottom: 20px;
 }
 
-/* Estilos para las tarjetas de noticias */
+/* cards */
 .card {
     width: 100%;
     max-width: 85%;
-    background-color: #fff;
+    background-color: #efecec;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    margin: 0 auto;
     box-sizing: border-box;
     padding: 10px;
-    margin-bottom: 10px;
+    margin: 0 auto 10px;
 }
 
-/* Estilos para el título de la tarjeta de noticias */
+/* card title for the news */
 .card-title {
     font-size: 20px;
     font-weight: bold;
     margin-right: 10px;
     width: 95%;
     font-family: "Open Sans", sans-serif;
-    color: #ad051d;
+    color: #b00c23;
 }
 
-/* Estilos para la descripción de la tarjeta de noticias */
+/* card description */
 .card-description {
     font-size: 16px;
     line-height: 1.1;
     margin-bottom: 3px;
     /*color: #452f2f;*/
-    color: #361515;
+    color: #5e2828;
     font-family: "Open Sans", sans-serif;
 }
 
-/* Estilos para el contenido de la tarjeta de noticias */
 .card-content {
     padding: 5px;
     color: #777;
@@ -111,7 +108,6 @@ body {
     align-items: center;
 }
 
-/* Estilos para el botón de la tarjeta de noticias */
 .card-button {
     display: inline-block;
     padding: 10px 20px;
@@ -121,7 +117,7 @@ body {
     text-decoration: none;
     border-radius: 5px;
     margin-top: 10px;
-    background-color: #2d3e50; /* Detalles en azul oscuro */
+    background-color: #2d3e50;
     font-family: "Roboto", sans-serif;
 }
 
@@ -188,7 +184,8 @@ footer {
     margin-top: auto;
     background-color: #0d263d;
 }
-/* Estilos para pantallas pequeñas (móviles y tablets) */
+
+/* media queries */
 @media screen and (max-width: 768px) {
     .feed {
         justify-content: center;

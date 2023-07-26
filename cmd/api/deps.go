@@ -13,7 +13,7 @@ const (
 	portLocal = "9000"
 
 	mysqlURI      = "tomi:tomi@tcp(localhost:3306)/news_api_dev"
-	templateCache = true
+	templateCache = false
 )
 
 type dependencies struct {
