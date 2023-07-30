@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	maxOpenConnections = 100
-	maxIdleConnections = 0
+	maxOpenConnections = 25
+	maxIdleConnections = 20
 )
 
 // Storage will interact with the DB.
@@ -38,7 +38,7 @@ func NewStorage(url string) *SQLStorage {
 		log.Fatal().Err(err)
 	}
 
-	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetConnMaxLifetime(time.Minute * 5)
 	db.SetMaxOpenConns(maxOpenConnections)
 	db.SetMaxIdleConns(maxIdleConnections)
 
@@ -71,7 +71,6 @@ func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 			log.Warn().Err(err).Msg("cannot save article_categories")
 		}
 	}
-
 	return &a, nil
 }
 
@@ -112,6 +111,10 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	defer func() {
+		_ = rows.Close()
+	}()
 
 	result := make([]Article, 0, defSize)
 	for rows.Next() {
