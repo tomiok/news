@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 )
 
@@ -32,7 +32,8 @@ type SQLStorage struct {
 }
 
 func NewStorage(url string) *SQLStorage {
-	db, err := sql.Open("mysql", url)
+	fmt.Println(url)
+	db, err := sql.Open("postgres", url)
 
 	if err != nil {
 		log.Fatal().Err(err)
@@ -52,8 +53,8 @@ func NewStorage(url string) *SQLStorage {
 }
 
 func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
-	res, err := s.Exec("insert into articles (title, uid, description, content, link, country, location, lang, source, pub_date, saved_at) values (?,?,?,?,?,?,?,?,?,?,?)",
-		a.Title, a.UID, a.Description, a.Content, a.Link, a.Country, a.Location, a.Lang, a.Source, a.PubDate, a.SavedAt)
+	res, err := s.Exec("insert into articles (title, uid, description, content, rawContent, link, country, location, lang, source, pub_date, saved_at) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+		a.Title, a.UID, a.Description, a.Content, a.RawContent, a.Link, a.Country, a.Location, a.Lang, a.Source, a.PubDate, a.SavedAt)
 
 	if err != nil {
 		return nil, err
@@ -67,7 +68,7 @@ func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 	a.ID = id
 
 	for _, catID := range a.Categories {
-		if _, err := s.Exec("insert into article_categories (article_id, category_id) values (?,?)", a.ID, catID); err != nil {
+		if _, err := s.Exec("insert into article_categories (article_id, category_id) values ($1,$2)", a.ID, catID); err != nil {
 			log.Warn().Err(err).Msg("cannot save article_categories")
 		}
 	}
@@ -76,13 +77,14 @@ func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
 
 func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 	var article Article
-	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.country, a.location, a.lang, a.source, a.pub_date from articles a where a.uid=?", uid)
+	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.country, a.location, a.lang, a.source, a.pub_date from articles a where a.uid=$1", uid)
 	err := row.Scan(
 		&article.ID,
 		&article.UID,
 		&article.Title,
 		&article.Description,
 		&article.Content,
+		&article.RawContent,
 		&article.Country,
 		&article.Location,
 		&article.Lang,
@@ -104,7 +106,7 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	if locations == nil || len(locations) == 0 {
 		return nil, errors.New("locations are nil or empty")
 	}
-	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.link, a.country, a.location, a.lang, a.pub_date from articles a where a.location in (?,?) and a.pub_date >= ? ORDER BY RAND() limit 50",
+	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date from articles a where a.location in ($1,$2) and a.pub_date >= $3 ORDER BY RANDOM() limit 50",
 		locations[0], locations[1], oneDay,
 	)
 
@@ -125,6 +127,7 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 			&article.Title,
 			&article.Description,
 			&article.Content,
+			&article.RawContent,
 			&article.Link,
 			&article.Country,
 			&article.Location,
@@ -156,7 +159,7 @@ func (s *SQLStorage) AcquireLock() (*Lock, error) {
 	}
 
 	if countID == 0 {
-		_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values(?,?)", true, time.Now().UnixMilli())
+		_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values($1,$2)", true, time.Now().UnixMilli())
 		if err != nil {
 			_ = tx.Rollback()
 			return nil, err
@@ -193,7 +196,7 @@ func (s *SQLStorage) AcquireLock() (*Lock, error) {
 		return nil, err
 	}
 
-	_, err = tx.Exec("update feed_lock set is_locked = false, timestamp = ? where is_locked = true",
+	_, err = tx.Exec("update feed_lock set is_locked = false, timestamp = $1 where is_locked = true",
 		time.Now().UnixMilli())
 	if err != nil {
 		_ = tx.Rollback()

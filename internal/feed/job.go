@@ -102,19 +102,20 @@ func (a *JobContainer) Sanitize(articlesCh, out chan RawArticle) {
 	var wg sync.WaitGroup
 	for rawArt := range articlesCh {
 		wg.Add(1)
-		title, desc, content := a.sanitizer.Apply(rawArt.Title, rawArt.Description, rawArt.Content)
-		go func(t, d, c string, rawArt RawArticle) {
+		title, desc, content, rawContent := a.sanitizer.Apply(rawArt.Title, rawArt.Description, rawArt.Content)
+		go func(t, d, c, rc string, rawArt RawArticle) {
 			wg.Done()
 			out <- RawArticle{
 				Title:       t,
 				Description: d,
 				Content:     c,
+				RawContent:  rc,
 				Country:     rawArt.Country,
 				Location:    rawArt.Location,
 				PubDate:     rawArt.PubDate,
 				Categories:  rawArt.Categories,
 			}
-		}(title, desc, content, rawArt)
+		}(title, desc, content, rawContent, rawArt)
 	}
 	wg.Wait()
 	close(out)
@@ -132,6 +133,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				UID:         uid,
 				Description: article.Description,
 				Content:     template.HTML(article.Content),
+				RawContent:  article.RawContent,
 				Country:     article.Country,
 				Location:    article.Location,
 				PubDate:     article.PubDate,

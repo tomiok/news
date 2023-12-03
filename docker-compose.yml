@@ -1,31 +1,32 @@
 version: '3'
 services:
   db:
-    image: mysql:5.7
-    container_name: db
-    ports:
-      - "3306:3306"
+    image: 'postgres:15.3'
+    restart: always
     environment:
-      - MYSQL_ROOT_HOST=db
-      - MYSQL_PASSWORD=root
-      - MYSQL_DATABASE=news_api_dev
-      - MYSQL_ROOT_PASSWORD=root
+      POSTGRES_DB: news
+      POSTGRES_USER: news
+      POSTGRES_PASSWORD: news
+    ports:
+      - "5432:5432"
     volumes:
-      - database_mysql:/var/lib/mysql2
+      - db-data:/var/lib/postgresql/data
+    labels:
+      io.portainer.accesscontrol.public: ""
   app:
     build: .
-    restart: always
+    restart: on-failure
     ports:
       - "9000:9000"
     depends_on:
       - db
     environment:
       DB_HOST: db
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root
+      DB_PORT: 5432
+      DB_USER: news
+      DB_PASSWORD: news
+
 volumes:
-  database_mysql:
-networks:
-  my-network:
-    driver: bridge
+  db-data:
+    labels:
+      io.portainer.accesscontrol.public: ""

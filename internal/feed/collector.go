@@ -39,6 +39,7 @@ type RawArticle struct {
 	Title       string
 	Description string // is like subtitle
 	Content     string // content is the news itself. Some sites may don't have it.
+	RawContent  string // do not use tags here.
 	Country     string // ISO code for the country AR, UY, BR...
 	Location    string // Specific location for a specific site.
 	Source      string // add the actual web portal.
@@ -63,6 +64,8 @@ type Article struct {
 	PubDate int64  `json:"pub_date"`
 	SavedAt int64  `json:"saved_at,omitempty"`
 	Since   string `json:"since"`
+
+	RawContent string `json:"parsed_content"`
 
 	Categories []int `json:"categories,omitempty"` // we have the category ids here.
 }

@@ -37,7 +37,7 @@ func run() {
 }
 
 func routes(r *chi.Mux, deps *dependencies) {
-	r.Use(middleware.RequestID, middleware.Recoverer, middleware.Logger, putCors(), middleware.Heartbeat("/ping"))
+	r.Use(middleware.Logger, middleware.RequestID, middleware.Recoverer, Cors(), middleware.Heartbeat("/ping"))
 
 	r.Get("/news/{slug}/{articleUID}", unwrap(deps.collectorHandler.GetNews))
 
@@ -47,7 +47,7 @@ func routes(r *chi.Mux, deps *dependencies) {
 }
 
 func collect(deps *dependencies) {
-	ticker := time.NewTicker(65 * time.Minute)
+	ticker := time.NewTicker(1 * time.Minute)
 	for _ = range ticker.C {
 		now := time.Now()
 		deps.AggregateJob.Do()
@@ -83,7 +83,7 @@ func fs(r chi.Router, path string, root http.FileSystem) {
 	})
 }
 
-func putCors() func(http.Handler) http.Handler {
+func Cors() func(http.Handler) http.Handler {
 	return cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://web6am.com"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"},

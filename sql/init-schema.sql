@@ -1,26 +1,31 @@
 CREATE TABLE articles
 (
-    id          INT          NOT NULL AUTO_INCREMENT,
+    id          SERIAL PRIMARY KEY,
     uid         VARCHAR(100) NOT NULL UNIQUE,
     title       VARCHAR(255) NOT NULL UNIQUE,
     description TEXT         NOT NULL,
     content     TEXT         NOT NULL,
+    raw_content TEXT         NOT NULL,
     link        VARCHAR(255) NOT NULL,
     country     VARCHAR(10)  NOT NULL,
     location    VARCHAR(100) NOT NULL,
     lang        VARCHAR(10)  NOT NULL,
     pub_date    BIGINT       NOT NULL,
     source      varchar(255) NOT NULL,
-    saved_at    BIGINT       NOT NULL,
-    PRIMARY KEY (id)
+    saved_at    BIGINT       NOT NULL
 );
 
 CREATE TABLE feed_lock
 (
-    id        INT     NOT NULL AUTO_INCREMENT,
-    is_locked TINYINT NOT NULL,
-    timestamp BIGINT  NOT NULL,
-    PRIMARY KEY (id)
+    id        SERIAL PRIMARY KEY,
+    is_locked BOOL   NOT NULL,
+    timestamp BIGINT NOT NULL
+);
+
+CREATE TABLE categories
+(
+    id   SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE article_categories
@@ -32,23 +37,16 @@ CREATE TABLE article_categories
     FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
-CREATE TABLE categories
-(
-    id   INT          NOT NULL AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE sites
 (
-    id          INT          NOT NULL AUTO_INCREMENT,
+    id          SERIAL PRIMARY KEY,
     url         VARCHAR(250) NOT NULL,
     category    VARCHAR(150),
-    has_content TINYINT,
+    has_content BOOL,
     country     VARCHAR(150),
-    location    VARCHAR(150),
-    PRIMARY KEY (id)
+    location    VARCHAR(150)
 );
+
 
 insert into sites (url, category, has_content, country, location)
 values ('https://www.rosario3.com/rss.html', 'actualidad', false, 'Argentina', 'Rosario'),
