@@ -53,7 +53,7 @@ func NewStorage(url string) *SQLStorage {
 }
 
 func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
-	res, err := s.Exec("insert into articles (title, uid, description, content, rawContent, link, country, location, lang, source, pub_date, saved_at) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
+	res, err := s.Exec("insert into articles (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
 		a.Title, a.UID, a.Description, a.Content, a.RawContent, a.Link, a.Country, a.Location, a.Lang, a.Source, a.PubDate, a.SavedAt)
 
 	if err != nil {
