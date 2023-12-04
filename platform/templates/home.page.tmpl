@@ -2,7 +2,7 @@
 {{define "content"}}
     <div class="feed">
         <div id="form" class="form">
-            <form hx-target="#news" hx-get="/feeds" method="get" xh-swap="outerHTML">
+            <form hx-target="#news" hx-get="/feeds" type="search" method="get">
                 <label>
                     <input type="text" name="l1" placeholder="Ciudad 1">
                 </label>
