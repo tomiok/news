@@ -19,7 +19,7 @@ func MakeSlug(title string) string {
 	return slug.MakeLang(title, "es")
 }
 
-func Trim(s template.HTML) template.HTML {
+func Trim(s string) string {
 	if len(s) < 150 {
 		return s
 	}

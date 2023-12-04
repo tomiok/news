@@ -151,53 +151,32 @@ func (s *SQLStorage) AcquireLock() (*Lock, error) {
 		return nil, err
 	}
 	var countID int
-	err = tx.QueryRow("select count(id) from feed_lock").Scan(&countID)
+	err = tx.QueryRow("select id from feed_lock order by id asc limit 1").Scan(&countID)
 
 	if err != nil {
-		_ = tx.Rollback()
-		return nil, err
-	}
-
-	if countID == 0 {
-		_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values($1,$2)", true, time.Now().UnixMilli())
-		if err != nil {
-			_ = tx.Rollback()
-			return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values($1,$2)", true, time.Now().UnixMilli())
+			return &Lock{
+				IsLocked:  true,
+				Timestamp: time.Now().Add(-2 * time.Hour).UnixMilli(),
+			}, tx.Commit()
 		}
-
-		return &Lock{
-			IsLocked:  false,
-			Timestamp: time.Now().Add(-2 * time.Hour).UnixMilli(),
-		}, tx.Commit()
-	}
-	res, err := tx.Exec("update feed_lock set is_locked = true where is_locked = false")
-
-	if err != nil {
-		_ = tx.Rollback()
 		return nil, err
 	}
-	count, err := res.RowsAffected()
+	var ts int64
+	var isLocked bool
+	err = tx.QueryRow("select is_locked, timestamp from feed_lock order by id asc limit 1").Scan(&isLocked, &ts)
 
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, err
 	}
 
-	if count == 0 {
-		_ = tx.Commit()
+	if time.Now().Sub(time.UnixMilli(ts)).Abs() < time.Hour {
 		return nil, errors.New("already locked")
 	}
 
-	var ts int64
-	err = tx.QueryRow("select timestamp from feed_lock where is_locked=true limit 1").Scan(&ts)
-
-	if err != nil {
-		_ = tx.Rollback()
-		return nil, err
-	}
-
-	_, err = tx.Exec("update feed_lock set is_locked = false, timestamp = $1 where is_locked = true",
-		time.Now().UnixMilli())
+	_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values($1,$2)", true, time.Now().UnixMilli())
 	if err != nil {
 		_ = tx.Rollback()
 		return nil, err
