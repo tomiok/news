@@ -47,6 +47,8 @@ CREATE TABLE sites
     location    VARCHAR(150)
 );
 
+-- https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/america/portada
+-- https://www.terra.com/rss
 
 insert into sites (url, category, has_content, country, location)
 values ('https://www.rosario3.com/rss.html', 'actualidad', false, 'Argentina', 'Rosario'),
