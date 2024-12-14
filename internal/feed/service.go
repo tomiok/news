@@ -1,8 +1,8 @@
 package feed
 
 const (
-	Argentina = "Argentina"
-	CABA      = "CABA"
+	Argentina = "argentina"
+	CABA      = "caba"
 )
 
 // GetNewsByUID give a UID (stored in DB) return an *Article.

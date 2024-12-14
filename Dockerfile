@@ -1,4 +1,4 @@
-ARG  BUILDER_IMAGE=golang:1.21.2-alpine
+ARG  BUILDER_IMAGE=golang:1.22.2-alpine
 ############################
 # STEP 1 build executable binary
 ############################
@@ -43,6 +43,7 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /go/bin/news /go/bin/news
 
 COPY static /static/
+COPY platform/templates /platform/templates/
 
 # Use an unprivileged user.
 USER appuser:appuser
