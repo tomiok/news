@@ -1,15 +1,21 @@
 package main
 
 import (
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"news/cmd/api"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
@@ -17,7 +23,8 @@ func main() {
 }
 
 func run() {
-	deps := newDeps()
+	deps := api.NewDeps()
+	migrateFn(deps.MigrationsDSN)
 
 	r := chi.NewRouter()
 	srv := &http.Server{
@@ -32,21 +39,21 @@ func run() {
 	go collect(deps)
 
 	routes(r, deps)
-	serv := server{Server: srv}
+	serv := api.Server{Server: srv}
 	serv.Start()
 }
 
-func routes(r *chi.Mux, deps *dependencies) {
+func routes(r *chi.Mux, deps *api.Dependencies) {
 	r.Use(middleware.Logger, middleware.RequestID, middleware.Recoverer, Cors(), middleware.Heartbeat("/ping"))
 
-	r.Get("/news/{slug}/{articleUID}", unwrap(deps.collectorHandler.GetNews))
-	r.Get("/feeds", unwrap(deps.collectorHandler.FeedsLookup))
-	r.Get("/", unwrap(deps.collectorHandler.Home))
+	r.Get("/news/{slug}/{articleUID}", api.Unwrap(deps.CollectorHandler.GetNews))
+	r.Get("/feeds", api.Unwrap(deps.CollectorHandler.FeedsLookup))
+	r.Get("/", api.Unwrap(deps.CollectorHandler.Home))
 
 	fileServer(r)
 }
 
-func collect(deps *dependencies) {
+func collect(deps *api.Dependencies) {
 	ticker := time.NewTicker(1 * time.Minute)
 	for _ = range ticker.C {
 		now := time.Now()
@@ -91,4 +98,21 @@ func Cors() func(http.Handler) http.Handler {
 		AllowCredentials: false,
 		MaxAge:           500,
 	})
+}
+
+func migrateFn(dsn string) {
+	m, err := migrate.New(
+		"file://migrations",
+		"postgres://"+dsn)
+	if err != nil {
+		panic(err)
+	}
+
+	if err = m.Up(); err != nil {
+		if errors.Is(err, migrate.ErrNoChange) {
+			log.Info().Msg("no migration needed")
+		} else {
+			panic(err)
+		}
+	}
 }

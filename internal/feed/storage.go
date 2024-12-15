@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/lib/pq"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -17,12 +19,10 @@ const (
 
 // Storage will interact with the DB.
 type Storage interface {
-	saveArticle(a Article) (*Article, error)
-	getArticleByUID(uid string) (*Article, error)
+	saveArticle(a Article) (Article, error)
+	getArticleByUID(uid string) (Article, error)
 
 	GetDBFeed(locs ...string) ([]Article, error)
-
-	AcquireLock() (*Lock, error)
 
 	GetSites() ([]Site, error)
 }
@@ -52,32 +52,42 @@ func NewStorage(url string) *SQLStorage {
 	}
 }
 
-func (s *SQLStorage) saveArticle(a Article) (*Article, error) {
-	res, err := s.Exec("insert into articles (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)",
-		a.Title, a.UID, a.Description, a.Content, a.RawContent, a.Link, a.Country, a.Location, a.Lang, a.Source, a.PubDate, a.SavedAt)
+func (s *SQLStorage) saveArticle(a Article) (Article, error) {
+	res, err := s.Exec(`insert into articles 
+    (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at,categories) 
+values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+		a.Title,
+		a.UID,
+		a.Description,
+		a.Content,
+		a.RawContent,
+		a.Link,
+		strings.ToLower(a.Country),
+		strings.ToLower(a.Location),
+		a.Lang,
+		a.Source,
+		a.PubDate,
+		a.SavedAt,
+		pq.Array(a.Categories))
 
 	if err != nil {
-		return nil, err
+		return Article{}, err
 	}
 
 	id, err := res.LastInsertId()
 
 	if err != nil {
-		return nil, fmt.Errorf("cannot get last inserted ID for articles: %w", err)
+		return Article{}, fmt.Errorf("cannot get last inserted ID for articles: %w", err)
 	}
 	a.ID = id
 
-	for _, catID := range a.Categories {
-		if _, err := s.Exec("insert into article_categories (article_id, category_id) values ($1,$2)", a.ID, catID); err != nil {
-			log.Warn().Err(err).Msg("cannot save article_categories")
-		}
-	}
-	return &a, nil
+	return a, nil
 }
 
-func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
+func (s *SQLStorage) getArticleByUID(uid string) (Article, error) {
 	var article Article
-	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.country, a.location, a.lang, a.source, a.pub_date from articles a where a.uid=$1", uid)
+	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.country, a.location, a.lang, a.source, a.pub_date, a.categories from articles a where a.uid=$1", uid)
+	var categories []string
 	err := row.Scan(
 		&article.ID,
 		&article.UID,
@@ -90,24 +100,27 @@ func (s *SQLStorage) getArticleByUID(uid string) (*Article, error) {
 		&article.Lang,
 		&article.Source,
 		&article.PubDate,
+		pq.Array(&categories),
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf("cannot get articles %w", err)
+		return article, fmt.Errorf("cannot get articles %w", err)
 	}
 
-	return &article, nil
+	article.Categories = categories
+	return article, nil
 }
 
 const defSize = 50
 
 func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
-	oneDay := time.Now().Add(-time.Hour * 48).UnixMilli()
+	back48Hours := time.Now().Add(-time.Hour * 48).UnixMilli()
 	if locations == nil || len(locations) == 0 {
 		return nil, errors.New("locations are nil or empty")
 	}
+
 	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date from articles a where a.location in ($1,$2) and a.pub_date >= $3 ORDER BY RANDOM() limit 50",
-		locations[0], locations[1], oneDay,
+		strings.ToLower(locations[0]), strings.ToLower(locations[1]), back48Hours,
 	)
 
 	if err != nil {
@@ -143,46 +156,6 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	}
 
 	return result, nil
-}
-
-func (s *SQLStorage) AcquireLock() (*Lock, error) {
-	tx, err := s.Begin()
-	if err != nil {
-		return nil, err
-	}
-	var countID int
-	err = tx.QueryRow("select id from feed_lock order by id asc limit 1").Scan(&countID)
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values($1,$2)", true, time.Now().UnixMilli())
-			return &Lock{
-				IsLocked:  true,
-				Timestamp: time.Now().Add(-2 * time.Hour).UnixMilli(),
-			}, tx.Commit()
-		}
-		return nil, err
-	}
-	var ts int64
-	var isLocked bool
-	err = tx.QueryRow("select is_locked, timestamp from feed_lock order by id asc limit 1").Scan(&isLocked, &ts)
-
-	if err != nil {
-		_ = tx.Rollback()
-		return nil, err
-	}
-
-	if time.Now().Sub(time.UnixMilli(ts)).Abs() < time.Hour {
-		return nil, errors.New("already locked")
-	}
-
-	_, err = tx.Exec("insert into feed_lock (is_locked, timestamp) values($1,$2)", true, time.Now().UnixMilli())
-	if err != nil {
-		_ = tx.Rollback()
-		return nil, err
-	}
-
-	return &Lock{IsLocked: false, Timestamp: ts}, tx.Commit()
 }
 
 func (s *SQLStorage) GetSites() ([]Site, error) {

@@ -67,7 +67,7 @@ type Article struct {
 
 	RawContent string `json:"parsed_content"`
 
-	Categories []int `json:"categories,omitempty"` // we have the category ids here.
+	Categories []string `json:"categories,omitempty"` // we have the category ids here.
 }
 
 func (a *Article) SinceMinutes() {

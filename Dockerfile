@@ -1,4 +1,4 @@
-ARG  BUILDER_IMAGE=golang:1.22.2-alpine
+ARG  BUILDER_IMAGE=golang:1.23.4-alpine
 ############################
 # STEP 1 build executable binary
 ############################
@@ -30,7 +30,7 @@ COPY . .
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -ldflags='-w -s -extldflags "-static"' -a \
-    -o /go/bin/news ./cmd/api
+    -o /go/bin/news ./cmd/api/main
 ############################
 # STEP 2 build a small image
 ############################

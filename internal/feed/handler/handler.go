@@ -48,7 +48,7 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return web.TemplateRender(w, "news.page.tmpl", &web.TemplateData{
-		Article: article,
+		Article: &article,
 	}, h.Cache)
 }
 

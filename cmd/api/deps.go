@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -21,17 +21,19 @@ const (
 	templateCache   = false
 )
 
-type dependencies struct {
+type Dependencies struct {
 	AggregateJob     *feed.JobContainer
-	collectorHandler *collectorHandler.Handler
+	CollectorHandler *collectorHandler.Handler
 
 	Port        string
 	Environment string // which env is the program running.
 
 	CacheTemplate bool //template is going to be cached (only true in prod).
+
+	MigrationsDSN string
 }
 
-func newDeps() *dependencies {
+func NewDeps() *Dependencies {
 	env := getVar("ENV", envLocal)
 	port := getVar("PORT", portLocal)
 
@@ -46,6 +48,8 @@ func newDeps() *dependencies {
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, dbUser, dbPassword, dbName, dbPort)
 
+	migrationsDSN := fmt.Sprintf("%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
+
 	_storage := feed.NewStorage(dsn)
 	_job, err := feed.NewJob(_storage)
 
@@ -59,12 +63,13 @@ func newDeps() *dependencies {
 		log.Fatal().Msg(err.Error())
 	}
 
-	return &dependencies{
+	return &Dependencies{
 		AggregateJob:     _job,
-		collectorHandler: _collectorHandler,
+		CollectorHandler: _collectorHandler,
 
-		Environment: env,
-		Port:        port,
+		Environment:   env,
+		Port:          port,
+		MigrationsDSN: migrationsDSN,
 	}
 }
 

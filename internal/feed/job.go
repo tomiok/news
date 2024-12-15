@@ -14,12 +14,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Lock is a mechanism to run only once the Job that get the feeds and save it in the database.
-type Lock struct {
-	IsLocked  bool
-	Timestamp int64
-}
-
 // JobAggregator will be the abstraction of get the read the CSV, get the RSS, sanitize and save in Database.
 type JobAggregator interface {
 	Do()
@@ -42,23 +36,13 @@ func NewJob(storage Storage) (*JobContainer, error) {
 }
 
 func (a *JobContainer) Do() {
-	lock, err := a.storage.AcquireLock()
-	if err != nil {
-		log.Warn().Err(err).Msg("collector is locked")
-		return
-	}
-
-	if time.Now().Sub(time.UnixMilli(lock.Timestamp)).Abs() < time.Hour {
-		log.Warn().Msg("last run was less than 1 hour")
-		return
-	}
-
-	log.Info().Msgf("running job: %s", time.UnixMilli(lock.Timestamp))
+	log.Info().Msgf("running job at: %s", time.Now().Format(time.RFC3339))
 	// declare channels
 	chSites := make(chan Site)
 	chArticles := make(chan RawArticle)
 	transformedCh := make(chan RawArticle)
 	done := make(chan struct{})
+
 	go a.getSites(chSites)
 	go a.getRawArticles(chSites, chArticles)
 	go a.Sanitize(chArticles, transformedCh)
@@ -125,23 +109,23 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 	var wg sync.WaitGroup
 	for article := range ch {
 		wg.Add(1)
-		go func(article RawArticle) {
+		go func(rawArticle RawArticle) {
 			defer wg.Done()
 			uid := a.GenerateID()
 			_, err := a.storage.saveArticle(Article{
-				Title:       article.Title,
+				Title:       rawArticle.Title,
 				UID:         uid,
-				Description: article.Description,
-				Content:     template.HTML(article.Content),
-				RawContent:  article.RawContent,
-				Country:     article.Country,
-				Location:    article.Location,
-				PubDate:     article.PubDate,
-				Link:        createLink(article.Title, uid),
-				Source:      article.Source,
+				Description: rawArticle.Description,
+				Content:     template.HTML(rawArticle.Content),
+				RawContent:  rawArticle.RawContent,
+				Country:     rawArticle.Country,
+				Location:    rawArticle.Location,
+				PubDate:     rawArticle.PubDate,
+				Link:        createLink(rawArticle.Title, uid),
+				Source:      rawArticle.Source,
 				SavedAt:     time.Now().UnixMilli(),
-				Lang:        getLang(article.Country),
-				Categories:  []int{},
+				Lang:        getLang(rawArticle.Country),
+				Categories:  rawArticle.Categories,
 			})
 			if err != nil {
 				_, ok := err.(*mysql.MySQLError)

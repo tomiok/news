@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"context"
@@ -12,12 +12,12 @@ import (
 	"time"
 )
 
-type server struct {
+type Server struct {
 	*http.Server
 }
 
 // Start runs ListenAndServe on the http.Server with graceful shutdown.
-func (s *server) Start() {
+func (s *Server) Start() {
 	log.Info().Msgf("server is running on port %s", s.Addr)
 	go func() {
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -27,7 +27,7 @@ func (s *server) Start() {
 	s.gracefulShutdown()
 }
 
-func (s *server) gracefulShutdown() {
+func (s *Server) gracefulShutdown() {
 	quit := make(chan os.Signal, 1)
 
 	signal.Notify(quit, syscall.SIGINT)
@@ -44,9 +44,9 @@ func (s *server) gracefulShutdown() {
 	log.Info().Msg("server stopped")
 }
 
-type webHandler func(w http.ResponseWriter, r *http.Request) error
+type WebHandler func(w http.ResponseWriter, r *http.Request) error
 
-func unwrap(f webHandler) http.HandlerFunc {
+func Unwrap(f WebHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := f(w, r)
 
