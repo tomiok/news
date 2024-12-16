@@ -49,3 +49,7 @@ test-cover:
 .PHONY: run
 run:
 	@go run cmd/api/*.go
+
+.PHONY: docker
+docker:
+	@docker compose up -d --no-deps --build

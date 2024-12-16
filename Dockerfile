@@ -43,6 +43,7 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /go/bin/news /go/bin/news
 
 COPY static /static/
+COPY migrations /migrations/
 COPY platform/templates /platform/templates/
 
 # Use an unprivileged user.
