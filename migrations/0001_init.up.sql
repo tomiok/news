@@ -61,5 +61,9 @@ values ('https://www.rosario3.com/rss.html', 'actualidad', false, 'argentina', '
        ('https://www.rionegro.com.ar/feed/', 'actualidad', true, 'argentina', 'rio negro'),
        ('https://www.eltribuno.com/salta/rss-new/portada.rss', 'actualidad', true, 'argentina', 'salta'),
        ('https://www.eltribuno.com/jujuy/rss-new/portada.rss', 'actualidad', true, 'argentina', 'jujuy'),
-       ('https://ojodeprensa.com.ar/feed/', 'actualidad', true, 'argentina', 'rosario');
+       ('https://ojodeprensa.com.ar/feed/', 'actualidad', true, 'argentina', 'rosario'),
+       ('https://diarioconurbano.com.ar/feed', 'actualidad', true, 'argentina', 'conurbano'),
+       ('https://conurbanodiario.com.ar/?feed=rss2', 'actualidad', true, 'argentina', 'conurbano'),
+       ('https://www.infoban.com.ar/feed/', 'actualidad', true, 'argentina', 'conurbano'),
+       ('https://www.inforegion.com.ar/feed/', 'actualidad', false, 'argentina', 'conurbano');
 

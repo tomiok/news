@@ -27,9 +27,8 @@ func Trim(s string) string {
 }
 
 type TemplateData struct {
-	FirstLocation  string
-	SecondLocation string
-	Articles       any
+	Locations string
+	Articles  any
 
 	Article *feed.Article
 	Since   int

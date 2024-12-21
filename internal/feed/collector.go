@@ -16,7 +16,6 @@ import (
 const hours24 = 86400000
 
 const (
-	countryAR   = "Argentina"
 	langSpanish = "es_AR"
 )
 

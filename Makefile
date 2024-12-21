@@ -1,7 +1,7 @@
 PACKAGES_PATH = $(shell go list -f '{{ .Dir }}' ./...)
 
 .PHONY: all
-all: require tidy fmt goimports vet staticcheck test
+all: require tidy goimports staticcheck test
 
 .PHONY: require
 require:
@@ -15,20 +15,11 @@ tidy:
 	@echo "=> Executing go mod tidy"
 	@go mod tidy
 
-.PHONY: fmt
-fmt:
-	@echo "=> Executing go fmt"
-	@go fmt ./...
-
 .PHONY: goimports
 goimports:
 	@echo "=> Executing goimports"
 	@goimports -w $(PACKAGES_PATH)
 
-.PHONY: vet
-vet:
-	@echo "=> Executing go vet"
-	@go vet ./...
 
 .PHONY: staticcheck
 staticcheck:
@@ -38,7 +29,7 @@ staticcheck:
 .PHONY: test
 test:
 	@echo "=> Running tests"
-	@go test ./... -covermode=atomic -coverpkg=./... -count=1 -race -shuffle=on
+	@go test ./... -count=1 -race -shuffle=on
 
 .PHONY: test-cover
 test-cover:
@@ -53,3 +44,7 @@ run:
 .PHONY: docker
 docker:
 	@docker compose up -d --no-deps --build
+
+.PHONY: db
+db:
+	@docker compose up db

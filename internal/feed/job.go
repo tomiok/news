@@ -48,6 +48,7 @@ func (a *JobContainer) Do() {
 	go a.Sanitize(chArticles, transformedCh)
 	go a.Save(transformedCh, done)
 	<-done
+	close(done)
 }
 
 func (a *JobContainer) GenerateID() string {
@@ -141,7 +142,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 
 func getLang(country string) string {
 	var m = map[string]string{
-		countryAR: langSpanish,
+		Argentina: langSpanish,
 	}
 
 	return m[country]

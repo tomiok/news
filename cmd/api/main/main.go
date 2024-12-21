@@ -54,7 +54,7 @@ func routes(r *chi.Mux, deps *api.Dependencies) {
 }
 
 func collect(deps *api.Dependencies) {
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(10 * time.Hour)
 	for _ = range ticker.C {
 		now := time.Now()
 		deps.AggregateJob.Do()

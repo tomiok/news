@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"news/internal/feed"
 	"news/platform/web"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -53,49 +54,42 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
-	l1 := r.URL.Query().Get("l1")
-	l2 := r.URL.Query().Get("l2")
-
-	if l1 == "" {
-		l1 = feed.Argentina
+	l := r.URL.Query().Get("l1")
+	var locations []string
+	if l == "" {
+		locations = []string{feed.Argentina, feed.CABA}
+	} else {
+		locations = strings.Split(l, ",")
 	}
 
-	if l2 == "" {
-		l2 = feed.CABA
-	}
-
-	articles, err := h.Service.GetFeed(l1, l2)
+	articles, err := h.Service.GetFeed(locations...)
 	if err != nil {
 		return err
 	}
 
 	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
-		FirstLocation:  l1,
-		SecondLocation: l2,
-		Articles:       articles,
+		Locations: strings.Join(locations, ","),
+		Articles:  articles,
 	}, h.Cache)
 }
 
+const maxLocations = 3
+
 func (h *Handler) FeedsLookup(w http.ResponseWriter, r *http.Request) error {
-	l1 := r.URL.Query().Get("l1")
-	l2 := r.URL.Query().Get("l2")
+	l := r.URL.Query().Get("l")
+	locations := strings.Split(l, ",")
 
-	if l1 == "" {
-		l1 = feed.Argentina
+	if len(locations) > maxLocations {
+		locations = locations[0:2]
 	}
 
-	if l2 == "" {
-		l2 = feed.CABA
-	}
-
-	articles, err := h.Service.GetFeed(l1, l2)
+	articles, err := h.Service.GetFeed(locations...)
 	if err != nil {
 		return err
 	}
 
 	return web.TemplateRender(w, "feed.news.page.tmpl", &web.TemplateData{
-		FirstLocation:  l1,
-		SecondLocation: l2,
-		Articles:       articles,
+		Locations: strings.Join(locations, ","),
+		Articles:  articles,
 	}, h.Cache)
 }
