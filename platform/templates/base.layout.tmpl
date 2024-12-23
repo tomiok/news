@@ -9,6 +9,8 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Noticia+Text&display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/fonts/css2?family=Playfair+Display:wght@400;700&display=swap"
+              rel="stylesheet">
         <meta name="title" content="Web 6 am">
         <meta name="description" content="Compilamos informacion mas relevante y te la traemos">
 
@@ -48,13 +50,21 @@
     {{ block "content" . }}
 
     {{ end }}
-    <footer>
-        <div class="container">
-            <span class="text-muted">© 2023 Copyright: Tomasito</span>
-            <br>
-            <span class="text-muted">home</span>
-            <span class="text-muted">about</span>
-            <span class="text-muted">contact</span>
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 News Feed. All Rights Reserved.</p>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <div class="footer-social">
+                <a href="#">Twitter</a>
+                <a href="#">Facebook</a>
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+            </div>
         </div>
     </footer>
     <script src="https://unpkg.com/htmx.org@1.9.2"

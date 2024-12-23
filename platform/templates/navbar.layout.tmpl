@@ -1,0 +1,18 @@
+{{define "navbar"}}
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="#" class="navbar-logo">Inforia</a>
+            <div class="search-container">
+                <label>
+                    <input type="text" class="search-input"
+                           hx-get="/feeds"
+                           hx-target="#news"
+                           method="get"
+                           name="l"
+                           placeholder="lugares">
+                </label>
+                <div class="autocomplete-list"></div>
+            </div>
+        </div>
+    </nav>
+{{end}}
