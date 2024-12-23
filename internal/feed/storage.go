@@ -119,7 +119,7 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 		return nil, errors.New("locations are nil or empty")
 	}
 
-	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date from articles a where a.location in ($1) and a.pub_date >= $2 ORDER BY RANDOM() limit 50",
+	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories from articles a where a.location in ($1) and a.pub_date >= $2 ORDER BY RANDOM() limit 50",
 		strings.ToLower(locations[0]), back48Hours,
 	)
 
@@ -131,6 +131,7 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 		_ = rows.Close()
 	}()
 
+	var categories []string
 	result := make([]Article, 0, defSize)
 	for rows.Next() {
 		var article Article
@@ -146,12 +147,14 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 			&article.Location,
 			&article.Lang,
 			&article.PubDate,
+			pq.Array(&categories),
 		)
 		if err != nil {
 			log.Error().Err(err).Msg("cannot read article")
 			continue
 		}
 		article.SinceMinutes()
+		article.Categories = categories
 		result = append(result, article)
 	}
 
