@@ -1,41 +1,44 @@
 {{template "base" .}}
 {{define "content"}}
+    {{block "navbar" .}}
+    {{end}}
     <div class="feed">
-        <div id="form" class="form">
-            <form hx-get="/feeds" hx-target="#news" method="get">
-                <label>
-                    <input type="text" name="l" placeholder="lugares">
-                </label>
-                <button type="submit">Buscar</button>
-            </form>
-        </div>
         <div id="news">
             <h1 class="title">Noticias de las últimas 24 horas</h1>
             <h3 class="subtitle">Estás leyendo para {{.Locations}}</h3>
-            {{range $article := .Articles}}
-                <div class="card">
-                    <h2 class="card-title">
-                        {{ $article.Title }}
-                    </h2>
-                    <div class="card-description">
-                        {{ $article.Description}}
-                    </div>
-                    <div class="card-content">
-                        {{ $article.RawContent | Cut}}
-                    </div>
-                    <div class="card-footer">
-                        <div class="card-category">
-                            {{ $article.Categories }}
-                        </div>
-                        <span class="card-time">
+            <div id="sticky-button">
+                <a href="/finance">Finance</a>
+            </div>
+            <div class="container" id="newsFeed">
+                {{range $article := .Articles}}
+
+                    <div class="card">
+                        <div class="card-container">
+                            <h2 class="card-title">
+                                {{ $article.Title }}
+                            </h2>
+                            <div class="card-description">
+                                {{ $article.Description}}
+                            </div>
+                            <div class="card-content">
+                                {{ $article.RawContent | Cut}}
+                            </div>
+                            <div class="card-footer">
+                                <div class="card-category">
+                                    {{ $article.Categories }}
+                                </div>
+                                <span class="card-time">
                             {{$article.Since}}
                         </span>
+                            </div>
+                            <a class="card-link" href="/news/{{$article.Title | MakeSlug}}/{{$article.UID}}">
+
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-actions">
-                        <a href="/news/{{$article.Title | MakeSlug}}/{{$article.UID}}" class="card-button">Ver más</a>
-                    </div>
-                </div>
-            {{end}}
+
+                {{end}}
+            </div>
         </div>
     </div>
 {{end}}
