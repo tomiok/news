@@ -390,4 +390,20 @@ body {
     .search-container {
         width: 100%;
     }
+
+    .navbar-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1rem;
+    }
+
+    .search-container {
+        width: 50%;
+    }
+
+    .navbar-logo {
+        font-size: 1.2rem; /* Slightly smaller font size for mobile */
+    }
 }
+
