@@ -32,7 +32,6 @@ type SQLStorage struct {
 }
 
 func NewStorage(url string) *SQLStorage {
-	fmt.Println(url)
 	db, err := sql.Open("postgres", url)
 
 	if err != nil {
