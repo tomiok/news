@@ -92,7 +92,7 @@ func fs(r chi.Router, path string, root http.FileSystem) {
 
 func Cors() func(http.Handler) http.Handler {
 	return cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://web6am.com"},
+		AllowedOrigins:   []string{"https://inforia.com"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-Content-Type-Options"},
 		AllowCredentials: false,

@@ -1,4 +1,4 @@
-const CACHE_NAME = "web6am";
+const CACHE_NAME = "inforia";
 const urlsToCache = [
     "/static/favicon.ico",
     "/static/styles.css"
