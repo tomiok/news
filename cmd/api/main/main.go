@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"news/cmd/api"
+	"news/internal/feed"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,7 +37,7 @@ func run() {
 		Handler:      r,
 	}
 
-	go collect(deps)
+	go feed.Collect(time.Hour*10, deps.AggregateJob)
 
 	routes(r, deps)
 	serv := api.Server{Server: srv}
@@ -51,16 +52,6 @@ func routes(r *chi.Mux, deps *api.Dependencies) {
 	r.Get("/", api.Unwrap(deps.CollectorHandler.Home))
 
 	fileServer(r)
-}
-
-func collect(deps *api.Dependencies) {
-	ticker := time.NewTicker(10 * time.Hour)
-	for _ = range ticker.C {
-		now := time.Now()
-		deps.AggregateJob.Do()
-
-		log.Info().Msgf("job duration: %s", time.Since(now))
-	}
 }
 
 func fileServer(r chi.Router) {
@@ -92,7 +83,7 @@ func fs(r chi.Router, path string, root http.FileSystem) {
 
 func Cors() func(http.Handler) http.Handler {
 	return cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://inforia.com"},
+		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-Content-Type-Options"},
 		AllowCredentials: false,

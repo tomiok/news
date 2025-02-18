@@ -6,26 +6,36 @@
     <div id="news">
         <h1 class="title">Noticias de las últimas 24 horas</h1>
         <h3 class="subtitle">Estás leyendo para {{.Locations}}</h3>
-        {{range $article := .Articles}}
-            <a href="/news/{{$article.Title | MakeSlug}}/{{$article.UID}}" class="card">
-                <h2 class="card-title">
-                    {{ $article.Title }}
-                </h2>
-                <div class="card-description">
-                    {{ $article.Description}}
-                </div>
-                <div class="card-content">
-                    {{ $article.RawContent | Cut}}
-                </div>
-                <div class="card-footer">
-                    <div class="card-category">
-                        {{$article.Categories}}
+
+        <div class="container" id="newsFeed">
+            {{range $article := .Articles}}
+
+                <div class="card">
+                    <div class="card-container">
+                        <h2 class="card-title">
+                            {{ $article.Title }}
+                        </h2>
+                        <div class="card-description">
+                            {{ $article.Description}}
+                        </div>
+                        <div class="card-content">
+                            {{ $article.RawContent | Cut}}
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-category">
+                                {{ $article.Categories }}
+                            </div>
+                            <span class="card-time">
+                            {{$article.Since}}
+                        </span>
+                        </div>
+                        <a class="card-link" href="/news/{{$article.Title | MakeSlug}}/{{$article.UID}}">
+
+                        </a>
                     </div>
-                    <span class="card-time">
-                    {{$article.Since}}
-                </span>
                 </div>
-            </a>
-        {{end}}
+
+            {{end}}
+        </div>
     </div>
 {{end}}

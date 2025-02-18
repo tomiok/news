@@ -315,6 +315,42 @@ body {
     color: white;
 }
 
+.back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(51, 51, 51, 0.8);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: none;
+}
+
+.back-to-top:hover {
+    background-color: rgba(51, 51, 51, 1);
+    transform: translateY(-3px);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
 /* media queries */
 @media screen and (max-width: 768px) {
     .feed {

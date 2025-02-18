@@ -5,6 +5,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"news/internal/feed"
 	collectorHandler "news/internal/feed/handler"
+	"news/internal/feed/storage"
 	"os"
 	"strconv"
 )
@@ -50,7 +51,7 @@ func NewDeps() *Dependencies {
 
 	migrationsDSN := fmt.Sprintf("%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	_storage := feed.NewStorage(dsn)
+	_storage := storage.NewStorage(dsn)
 	_job, err := feed.NewJob(_storage)
 
 	if err != nil {

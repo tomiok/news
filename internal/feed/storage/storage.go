@@ -1,10 +1,11 @@
-package feed
+package storage
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/lib/pq"
+	"news/internal/feed"
 	"strings"
 	"time"
 
@@ -16,16 +17,6 @@ const (
 	maxOpenConnections = 25
 	maxIdleConnections = 20
 )
-
-// Storage will interact with the DB.
-type Storage interface {
-	saveArticle(a Article) (Article, error)
-	getArticleByUID(uid string) (Article, error)
-
-	GetDBFeed(locs ...string) ([]Article, error)
-
-	GetSites() ([]Site, error)
-}
 
 type SQLStorage struct {
 	*sql.DB
@@ -51,7 +42,7 @@ func NewStorage(url string) *SQLStorage {
 	}
 }
 
-func (s *SQLStorage) saveArticle(a Article) (Article, error) {
+func (s *SQLStorage) SaveArticle(a feed.Article) (feed.Article, error) {
 	res, err := s.Exec(`insert into articles 
     (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at,categories) 
 values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
@@ -70,21 +61,21 @@ values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
 		pq.Array(a.Categories))
 
 	if err != nil {
-		return Article{}, err
+		return feed.Article{}, err
 	}
 
 	id, err := res.LastInsertId()
 
 	if err != nil {
-		return Article{}, fmt.Errorf("cannot get last inserted ID for articles: %w", err)
+		return feed.Article{}, fmt.Errorf("cannot get last inserted ID for articles: %w", err)
 	}
 	a.ID = id
 
 	return a, nil
 }
 
-func (s *SQLStorage) getArticleByUID(uid string) (Article, error) {
-	var article Article
+func (s *SQLStorage) GetArticleByUID(uid string) (feed.Article, error) {
+	var article feed.Article
 	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.country, a.location, a.lang, a.source, a.pub_date, a.categories from articles a where a.uid=$1", uid)
 	var categories []string
 	err := row.Scan(
@@ -112,7 +103,7 @@ func (s *SQLStorage) getArticleByUID(uid string) (Article, error) {
 
 const defSize = 50
 
-func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
+func (s *SQLStorage) GetDBFeed(locations ...string) ([]feed.Article, error) {
 	back48Hours := time.Now().Add(-time.Hour * 48).UnixMilli()
 	if locations == nil || len(locations) == 0 {
 		return nil, errors.New("locations are nil or empty")
@@ -131,9 +122,9 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	}()
 
 	var categories []string
-	result := make([]Article, 0, defSize)
+	result := make([]feed.Article, 0, defSize)
 	for rows.Next() {
-		var article Article
+		var article feed.Article
 		err = rows.Scan(
 			&article.ID,
 			&article.UID,
@@ -160,16 +151,16 @@ func (s *SQLStorage) GetDBFeed(locations ...string) ([]Article, error) {
 	return result, nil
 }
 
-func (s *SQLStorage) GetSites() ([]Site, error) {
+func (s *SQLStorage) GetSites() ([]feed.Site, error) {
 	rows, err := s.Query("select url, category, has_content, country, location from sites")
 
 	if err != nil {
 		return nil, err
 	}
 
-	var result []Site
+	var result []feed.Site
 	for rows.Next() {
-		var site Site
+		var site feed.Site
 		err = rows.Scan(&site.URL, &site.MainCategory, &site.HasContent, &site.Country, &site.Location)
 		if err != nil {
 			log.Error().Err(err)

@@ -113,7 +113,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 		go func(rawArticle RawArticle) {
 			defer wg.Done()
 			uid := a.GenerateID()
-			_, err := a.storage.saveArticle(Article{
+			_, err := a.storage.SaveArticle(Article{
 				Title:       rawArticle.Title,
 				UID:         uid,
 				Description: rawArticle.Description,

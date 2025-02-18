@@ -49,9 +49,14 @@
     {{ block "content" . }}
 
     {{ end }}
+    <button class="back-to-top" aria-label="Back to top">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+        </svg>
+    </button>
     <footer class="footer">
         <div class="footer-content">
-            <p>&copy; 2024 News Feed. All Rights Reserved.</p>
+            <p>&copy; 2025 News Feed. All Rights Reserved.</p>
             <div class="footer-links">
                 <a href="#">About</a>
                 <a href="#">Contact</a>
@@ -71,6 +76,28 @@
     </script>
     {{ block "js" .}}
     {{ end }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backToTopButton = document.querySelector('.back-to-top');
+
+            // Show button when scrolling down
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            });
+
+            // Smooth scroll to top when clicked
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
     </body>
     </html>
 {{ end }}
