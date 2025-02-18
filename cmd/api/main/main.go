@@ -48,7 +48,7 @@ func routes(r *chi.Mux, deps *api.Dependencies) {
 	r.Use(middleware.Logger, middleware.RequestID, middleware.Recoverer, Cors(), middleware.Heartbeat("/ping"))
 
 	r.Get("/news/{slug}/{articleUID}", api.Unwrap(deps.CollectorHandler.GetNews))
-	r.Get("/feeds", api.Unwrap(deps.CollectorHandler.FeedsLookup))
+	r.Get("/feeds", api.Unwrap(deps.CollectorHandler.FeedsSearch))
 	r.Get("/", api.Unwrap(deps.CollectorHandler.Home))
 
 	fileServer(r)

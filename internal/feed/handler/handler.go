@@ -75,8 +75,16 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 
 const maxLocations = 3
 
-func (h *Handler) FeedsLookup(w http.ResponseWriter, r *http.Request) error {
+func (h *Handler) FeedsSearch(w http.ResponseWriter, r *http.Request) error {
 	l := r.URL.Query().Get("l")
+	if l == "" {
+		return web.TemplateRender(w, "feed.news.page.tmpl", &web.TemplateData{
+			Locations: "",
+			Articles:  []any{},
+		}, h.Cache)
+	}
+
+	l = strings.ToLower(l)
 	locations := strings.Split(l, ",")
 
 	if len(locations) > maxLocations {

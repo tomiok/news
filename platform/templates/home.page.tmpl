@@ -1,4 +1,7 @@
 {{template "base" .}}
+{{define "head"}}
+    <link rel="stylesheet" href="/static/css/styles.css"/>
+{{end}}
 {{define "content"}}
     {{block "navbar" .}}
     {{end}}
@@ -39,4 +42,6 @@
             </div>
         </div>
     </div>
+{{end}}
+{{block "footer" .}}
 {{end}}
