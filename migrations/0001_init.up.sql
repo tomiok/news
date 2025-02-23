@@ -13,6 +13,7 @@ CREATE TABLE articles
     pub_date    BIGINT       NOT NULL,
     source      varchar(255) NOT NULL,
     saved_at    BIGINT       NOT NULL,
+    n_search    TSVECTOR,
     categories  TEXT[] NOT NULL DEFAULT '{}'::text[]
 );
 
@@ -26,6 +27,8 @@ CREATE TABLE sites
     location    VARCHAR(150),
     enabled     BOOL DEFAULT true
 );
+
+CREATE INDEX n_search_idx ON articles USING GIN (n_search);
 
 -- https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/america/portada
 -- https://www.terra.com/rss
