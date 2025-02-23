@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/rs/zerolog/log"
 	"news/internal/feed"
-	collectorHandler "news/internal/feed/handler"
+	"news/internal/feed/handler"
 	"news/internal/feed/storage"
 	"os"
 	"strconv"
@@ -24,7 +24,7 @@ const (
 
 type Dependencies struct {
 	AggregateJob     *feed.JobContainer
-	CollectorHandler *collectorHandler.Handler
+	CollectorHandler *handler.Handler
 
 	Port        string
 	Environment string // which env is the program running.
@@ -58,7 +58,7 @@ func NewDeps() *Dependencies {
 		log.Fatal().Msg(err.Error())
 	}
 
-	_collectorHandler, err := collectorHandler.New(_storage, tempCache)
+	_collectorHandler, err := handler.New(_storage, tempCache)
 
 	if err != nil {
 		log.Fatal().Msg(err.Error())
