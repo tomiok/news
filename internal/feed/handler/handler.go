@@ -1,12 +1,10 @@
 package handler
 
 import (
+	"github.com/go-chi/chi/v5"
 	"net/http"
 	"news/internal/feed"
 	"news/platform/web"
-	"strings"
-
-	"github.com/go-chi/chi/v5"
 )
 
 // Handler will carry the services logic to the web layer.
@@ -54,50 +52,32 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
-	l := r.URL.Query().Get("l1")
-	var locations []string
-	if l == "" {
-		locations = []string{feed.Argentina, feed.CABA}
-	} else {
-		locations = strings.Split(l, ",")
-	}
-
-	articles, err := h.Service.GetFeed(locations...)
+	articles, err := h.Service.GetFeed("")
 	if err != nil {
 		return err
 	}
 
 	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
-		Locations: strings.Join(locations, ","),
-		Articles:  articles,
+		Articles: articles,
 	}, h.Cache)
 }
 
 const maxLocations = 3
 
 func (h *Handler) FeedsSearch(w http.ResponseWriter, r *http.Request) error {
-	l := r.URL.Query().Get("l")
-	if l == "" {
+	q := r.URL.Query().Get("q")
+	if q == "" {
 		return web.TemplateRender(w, "feed.news.page.tmpl", &web.TemplateData{
-			Locations: "",
-			Articles:  []any{},
+			Articles: []any{},
 		}, h.Cache)
 	}
 
-	l = strings.ToLower(l)
-	locations := strings.Split(l, ",")
-
-	if len(locations) > maxLocations {
-		locations = locations[0:2]
-	}
-
-	articles, err := h.Service.GetFeed(locations...)
+	articles, err := h.Service.GetFeed(q)
 	if err != nil {
 		return err
 	}
 
 	return web.TemplateRender(w, "feed.news.page.tmpl", &web.TemplateData{
-		Locations: strings.Join(locations, ","),
-		Articles:  articles,
+		Articles: articles,
 	}, h.Cache)
 }

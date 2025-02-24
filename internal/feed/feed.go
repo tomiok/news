@@ -15,7 +15,7 @@ type Storage interface {
 	SaveArticle(a Article) (Article, error)
 	GetArticleByUID(uid string) (Article, error)
 
-	GetDBFeed(locs ...string) ([]Article, error)
+	GetDBFeed(q string) ([]Article, error)
 
 	GetSites() ([]Site, error)
 }
@@ -32,8 +32,8 @@ func (s *Service) GetNewsByUID(uid string) (Article, error) {
 }
 
 // GetFeed will return a slice of articles. A pair of locations will be given, if is empty, a default one will be added.
-func (s *Service) GetFeed(locations ...string) ([]Article, error) {
-	feed, err := s.Storage.GetDBFeed(locations...)
+func (s *Service) GetFeed(q string) ([]Article, error) {
+	feed, err := s.Storage.GetDBFeed(q)
 
 	if err != nil {
 		return nil, err

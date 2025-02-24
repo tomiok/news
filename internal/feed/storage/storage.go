@@ -2,7 +2,6 @@ package storage
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"github.com/lib/pq"
 	"news/internal/feed"
@@ -44,8 +43,8 @@ func NewStorage(url string) *SQLStorage {
 
 func (s *SQLStorage) SaveArticle(a feed.Article) (feed.Article, error) {
 	res, err := s.Exec(`insert into articles 
-    (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at,categories) 
-values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+    (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at,categories, n_search) 
+values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
 		a.Title,
 		a.UID,
 		a.Description,
@@ -58,7 +57,8 @@ values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
 		a.Source,
 		a.PubDate,
 		a.SavedAt,
-		pq.Array(a.Categories))
+		pq.Array(a.Categories),
+		a.Content)
 
 	if err != nil {
 		return feed.Article{}, err
@@ -103,15 +103,26 @@ func (s *SQLStorage) GetArticleByUID(uid string) (feed.Article, error) {
 
 const defSize = 50
 
-func (s *SQLStorage) GetDBFeed(locations ...string) ([]feed.Article, error) {
-	back48Hours := time.Now().Add(-time.Hour * 48).UnixMilli()
-	if locations == nil || len(locations) == 0 {
-		return nil, errors.New("locations are nil or empty")
+const querySelect = `select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories
+	from articles a `
+
+const clauseWhere = `where `
+const clausePubDate = `a.pub_date >= $1 `
+const clauseTextSearch = `n_search @@ to_tsquery('%s') `
+const clauseAnd = `and `
+const clauseOrder = ` ORDER BY RANDOM() limit 50`
+
+func (s *SQLStorage) GetDBFeed(q string) ([]feed.Article, error) {
+	back24Hours := time.Now().Add(-time.Hour * 24).UnixMilli()
+	query := querySelect + clauseWhere
+	if q != "" {
+		clause := fmt.Sprintf(clauseTextSearch, formatInputQuery(q))
+		query = query + clause + clauseAnd
 	}
 
-	rows, err := s.Query("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories from articles a where a.location in ($1) and a.pub_date >= $2 ORDER BY RANDOM() limit 50",
-		strings.ToLower(locations[0]), back48Hours,
-	)
+	query = query + clausePubDate + clauseOrder
+
+	rows, err := s.Query(query, back24Hours)
 
 	if err != nil {
 		return nil, err
@@ -169,4 +180,11 @@ func (s *SQLStorage) GetSites() ([]feed.Site, error) {
 	}
 
 	return result, nil
+}
+
+// formatInputQuery this is only with AND (& operator)
+func formatInputQuery(q string) string {
+	res := strings.Split(q, " ")
+
+	return strings.Join(res, " & ")
 }

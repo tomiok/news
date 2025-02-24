@@ -131,6 +131,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 			if err != nil {
 				_, ok := err.(*mysql.MySQLError)
 				if !ok {
+					log.Error().Err(err)
 					return
 				}
 			}
