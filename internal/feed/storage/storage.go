@@ -42,6 +42,7 @@ func NewStorage(url string) *SQLStorage {
 }
 
 func (s *SQLStorage) SaveArticle(a feed.Article) (feed.Article, error) {
+	loc := strings.ToLower(a.Location)
 	res, err := s.Exec(`insert into articles 
     (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at,categories, n_search) 
 values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
@@ -52,13 +53,13 @@ values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
 		a.RawContent,
 		a.Link,
 		strings.ToLower(a.Country),
-		strings.ToLower(a.Location),
+		loc,
 		a.Lang,
 		a.Source,
 		a.PubDate,
 		a.SavedAt,
 		pq.Array(a.Categories),
-		a.Content)
+		index(a.Categories, loc, string(a.Content)))
 
 	if err != nil {
 		return feed.Article{}, err
@@ -101,28 +102,28 @@ func (s *SQLStorage) GetArticleByUID(uid string) (feed.Article, error) {
 	return article, nil
 }
 
-const defSize = 50
-
-const querySelect = `select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories
-	from articles a `
-
-const clauseWhere = `where `
-const clausePubDate = `a.pub_date >= $1 `
-const clauseTextSearch = `n_search @@ to_tsquery('%s') `
-const clauseAnd = `and `
-const clauseOrder = ` ORDER BY RANDOM() limit 50`
+const (
+	querySelect = `select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories, ts_rank(n_search, 'argentina',  'caba | rosario') as rank from articles a where a.pub_date >= $1 limit 50`
+	defSize     = 50
+	rankQuery   = `select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories, ts_rank(n_search, query) as rank from articles a, to_tsquery($1) query where n_search  @@ query order by rank desc`
+)
 
 func (s *SQLStorage) GetDBFeed(q string) ([]feed.Article, error) {
 	back24Hours := time.Now().Add(-time.Hour * 24).UnixMilli()
-	query := querySelect + clauseWhere
+	var (
+		query string
+		p     any
+	)
+
 	if q != "" {
-		clause := fmt.Sprintf(clauseTextSearch, formatInputQuery(q))
-		query = query + clause + clauseAnd
+		query = rankQuery
+		p = formatInputQuery(q)
+	} else {
+		query = querySelect
+		p = back24Hours
 	}
 
-	query = query + clausePubDate + clauseOrder
-
-	rows, err := s.Query(query, back24Hours)
+	rows, err := s.Query(query, p)
 
 	if err != nil {
 		return nil, err
@@ -149,6 +150,7 @@ func (s *SQLStorage) GetDBFeed(q string) ([]feed.Article, error) {
 			&article.Lang,
 			&article.PubDate,
 			pq.Array(&categories),
+			new(float64),
 		)
 		if err != nil {
 			log.Error().Err(err).Msg("cannot read article")
@@ -187,4 +189,16 @@ func formatInputQuery(q string) string {
 	res := strings.Split(q, " ")
 
 	return strings.Join(res, " & ")
+}
+
+func index(categories []string, loc, content string) string {
+	var strBuilder strings.Builder
+
+	if len(categories) > 0 {
+		strBuilder.WriteString(strings.Join(categories, " "))
+	}
+	strBuilder.WriteString(loc)
+	strBuilder.WriteString(content)
+
+	return strBuilder.String()
 }

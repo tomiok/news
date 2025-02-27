@@ -51,6 +51,10 @@ func routes(r *chi.Mux, deps *api.Dependencies) {
 	r.Get("/search", api.Unwrap(deps.CollectorHandler.FeedsSearch))
 	r.Get("/", api.Unwrap(deps.CollectorHandler.Home))
 
+	r.Post("/force", func(w http.ResponseWriter, r *http.Request) {
+		deps.AggregateJob.Do()
+	})
+
 	fileServer(r)
 }
 
