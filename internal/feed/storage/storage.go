@@ -43,7 +43,7 @@ func NewStorage(url string) *SQLStorage {
 
 func (s *SQLStorage) SaveArticle(a feed.Article) (feed.Article, error) {
 	loc := strings.ToLower(a.Location)
-	res, err := s.Exec(`insert into articles 
+	_, err := s.Exec(`insert into articles 
     (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at,categories, n_search) 
 values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
 		a.Title,
@@ -64,13 +64,6 @@ values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
 	if err != nil {
 		return feed.Article{}, err
 	}
-
-	id, err := res.LastInsertId()
-
-	if err != nil {
-		return feed.Article{}, fmt.Errorf("cannot get last inserted ID for articles: %w", err)
-	}
-	a.ID = id
 
 	return a, nil
 }
@@ -103,9 +96,9 @@ func (s *SQLStorage) GetArticleByUID(uid string) (feed.Article, error) {
 }
 
 const (
-	querySelect = `select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories, ts_rank(n_search, 'argentina',  'caba | rosario') as rank from articles a where a.pub_date >= $1 limit 50`
-	defSize     = 50
+	querySelect = `select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories, ts_rank(n_search, query) as rank from articles a, to_tsquery('caba | rosario') query where n_search @@ query and pub_date >= $1 order by rank desc`
 	rankQuery   = `select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.link, a.country, a.location, a.lang, a.pub_date, a.categories, ts_rank(n_search, query) as rank from articles a, to_tsquery($1) query where n_search  @@ query order by rank desc`
+	defSize     = 50
 )
 
 func (s *SQLStorage) GetDBFeed(q string) ([]feed.Article, error) {
