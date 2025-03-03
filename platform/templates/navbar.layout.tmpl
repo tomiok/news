@@ -14,6 +14,42 @@
                     >
                 </label>
             </div>
+            <div class="hamburger-menu">
+                <div class="hamburger-icon" id="hamburger-button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="menu-items" id="menu-items">
+                    <a href="#" class="menu-item" id="add-source-btn">Add a source</a>
+                    <a href="/login" class="menu-item">Login</a>
+                </div>
+            </div>
         </div>
     </nav>
+
+    <!-- Source Modal -->
+    <div class="modal" id="source-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Add a Source</h3>
+            <form
+                    hx-post="/sources"
+                    hx-swap="outerHTML"
+                    hx-indicator="#spinner"
+            >
+                <input type="url" name="sourceUrl" placeholder="Enter URL" required class="modal-input">
+                <div class="form-actions">
+                    <button type="submit" class="modal-button">
+                        Add Source
+                        <span class="htmx-indicator" id="spinner">
+                            <svg class="spinner" viewBox="0 0 50 50">
+                                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 {{end}}

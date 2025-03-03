@@ -114,6 +114,121 @@
                     behavior: 'smooth'
                 });
             });
+
+            // Check if mobile
+            let isMobile = window.innerWidth <= 768;
+
+            // Get elements
+            const hamburgerButton = document.getElementById('hamburger-button');
+            const menuItems = document.getElementById('menu-items');
+            const addSourceBtn = document.getElementById('add-source-btn');
+            const sourceModal = document.getElementById('source-modal');
+            const closeModal = document.querySelector('.close-modal');
+
+            // Toggle hamburger menu
+            hamburgerButton.addEventListener('click', function() {
+                hamburgerButton.classList.toggle('active');
+                menuItems.classList.toggle('show');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!hamburgerButton.contains(event.target) && !menuItems.contains(event.target)) {
+                    hamburgerButton.classList.remove('active');
+                    menuItems.classList.remove('show');
+                }
+            });
+
+            // Open source modal
+            addSourceBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                sourceModal.classList.add('show');
+                // Close the hamburger menu when opening modal
+                hamburgerButton.classList.remove('active');
+                menuItems.classList.remove('show');
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                sourceModal.classList.remove('show');
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === sourceModal) {
+                    sourceModal.classList.remove('show');
+                }
+            });
+
+            // Handle window resize for responsiveness
+            window.addEventListener('resize', function() {
+                // Update mobile status on resize
+                isMobile = window.innerWidth <= 768;
+            });
+
+            // Add touch event handlers for mobile
+            if ('ontouchstart' in window) {
+                addSourceBtn.addEventListener('touchstart', function(event) {
+                    event.preventDefault();
+                    sourceModal.classList.add('show');
+                    hamburgerButton.classList.remove('active');
+                    menuItems.classList.remove('show');
+                });
+
+                closeModal.addEventListener('touchstart', function() {
+                    sourceModal.classList.remove('show');
+                });
+            }
+
+            // Handle HTMX responses
+            htmx.on('htmx:beforeSwap', function(evt) {
+                // Get the response text
+                const responseText = evt.detail.xhr.responseText;
+
+                // This will prevent the default swap from happening
+                evt.detail.shouldSwap = false;
+
+                // Check if response indicates success
+                if (evt.detail.xhr.status >= 200 && evt.detail.xhr.status < 300) {
+                    // Success - display quick message and close modal
+                    const form = evt.detail.target;
+
+                    // Reset form
+                    form.reset();
+
+                    // Create a success notification
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'source-success';
+                    successMessage.textContent = 'Source added successfully!';
+
+                    // Add it to the form
+                    form.appendChild(successMessage);
+
+                    // Close modal after a short delay
+                    setTimeout(function() {
+                        sourceModal.classList.remove('show');
+                        // Remove success message when closing
+                        form.removeChild(successMessage);
+                    }, 1500);
+                } else {
+                    // Error - display error message within form
+                    const form = evt.detail.target;
+
+                    // Check if form already has an error message
+                    const existingError = form.querySelector('.source-error');
+                    if (existingError) {
+                        form.removeChild(existingError);
+                    }
+
+                    // Create error message
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'source-error';
+                    errorMessage.textContent = responseText || 'Error adding source. Please try again.';
+
+                    // Add it to the form
+                    form.appendChild(errorMessage);
+                }
+            });
         });
     </script>
     </body>
