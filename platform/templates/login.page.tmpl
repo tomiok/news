@@ -1,0 +1,138 @@
+{{template "base" .}}
+{{define "head"}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Inforia</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #666;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #555;
+        }
+
+        .login-info {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .login-error {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        @media screen and (max-width: 480px) {
+            .login-container {
+                margin: 40px auto;
+                padding: 20px;
+                width: 90%;
+            }
+        }
+    </style>
+{{end}}
+{{define "content"}}
+    <div class="login-container">
+        <h1 class="login-title">Login to Inforia</h1>
+
+        {{if .LoginErr}}
+            <div class="login-error">
+                {{.LoginErr}}
+            </div>
+        {{end}}
+
+        <form class="login-form" method="POST" action="/login">
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address or Token</label>
+                <input
+                        type="text"
+                        id="email"
+                        name="email"
+                        class="form-input"
+                        placeholder="your@email.com or paste your token"
+                        required
+                        autocomplete="email"
+                        value="{{.Email}}"
+                >
+            </div>
+
+            <button type="submit" class="login-button">Continue</button>
+        </form>
+
+        <p class="login-info">We'll generate a token you can use to access your account</p>
+
+        <a href="/" class="back-link">← Back to home</a>
+    </div>
+{{end}}
