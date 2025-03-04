@@ -51,6 +51,11 @@ func routes(r *chi.Mux, deps *api.Dependencies) {
 	r.Get("/search", api.Unwrap(deps.CollectorHandler.FeedsSearch))
 	r.Get("/", api.Unwrap(deps.CollectorHandler.Home))
 
+	r.Get("/login", api.Unwrap(deps.CollectorHandler.LoginHandler))
+	r.Post("/login", api.Unwrap(deps.CollectorHandler.DoLogin))
+
+	r.Get("/token", api.Unwrap(deps.CollectorHandler.Token))
+
 	r.Post("/force", func(w http.ResponseWriter, r *http.Request) {
 		deps.AggregateJob.Do()
 	})

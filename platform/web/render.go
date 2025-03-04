@@ -31,6 +31,12 @@ type TemplateData struct {
 
 	Article *feed.Article
 	Since   int
+
+	LoginErr     string
+	Email        string
+	JustLoggedIn bool
+
+	Token string
 }
 
 var templates = make(map[string]*template.Template)

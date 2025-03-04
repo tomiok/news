@@ -6,6 +6,10 @@
     {{block "navbar" .}}
     {{end}}
     <div class="feed">
+        {{if false}}
+            {{block "login_success" .}}
+            {{end}}
+        {{end}}
         <div id="news">
             <h1 class="title">Noticias de las últimas 24 horas</h1>
             {{/*<h3 class="subtitle">Estás leyendo para {{.Locations}}</h3>*/}}

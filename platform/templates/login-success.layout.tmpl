@@ -1,0 +1,76 @@
+{{define "login_success"}}
+    <div class="login-success-banner" id="login-success-banner">
+        <div class="success-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <p>Successfully logged in!</p>
+            <button class="close-banner" onclick="document.getElementById('login-success-banner').style.display='none'">×</button>
+        </div>
+    </div>
+
+    <style>
+        .login-success-banner {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .success-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-banner {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .login-success-banner {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+
+    <script>
+        // Auto hide the success banner after 5 seconds
+        setTimeout(function() {
+            const banner = document.getElementById('login-success-banner');
+            if (banner) {
+                banner.style.opacity = '0';
+                banner.style.transform = 'translateX(100%)';
+                banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                setTimeout(() => banner.style.display = 'none', 300);
+            }
+        }, 5000);
+    </script>
+{{end}}
