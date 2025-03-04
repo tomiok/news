@@ -1,0 +1,181 @@
+{{template "base" .}}
+{{define "head"}}
+    <title>Your Access Token - Inforia</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .token-page {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .token-page-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .token-page-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .token-page-subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .token-display-box {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .token-code {
+            font-family: monospace;
+            font-size: 16px;
+            color: #333;
+            word-break: break-all;
+            margin: 0;
+        }
+
+        .copy-area {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .copy-button {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background-color: #555;
+        }
+
+        .copy-button.copied {
+            background-color: #28a745;
+        }
+
+        .token-instructions {
+            margin-top: 25px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .token-instructions p {
+            margin-bottom: 10px;
+        }
+
+        .continue-button {
+            display: block;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 25px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .continue-button:hover {
+            background-color: #555;
+        }
+
+        @media screen and (max-width: 640px) {
+            .token-page {
+                margin: 40px auto;
+                padding: 20px;
+                width: 90%;
+            }
+
+            .token-code {
+                font-size: 14px;
+            }
+        }
+    </style>
+{{end}}
+{{define "content"}}
+    <div class="token-page">
+        <div class="token-page-header">
+            <h1 class="token-page-title">Your Access Token</h1>
+            <p class="token-page-subtitle">Save this token to easily log in again</p>
+        </div>
+
+        <div class="token-display-box">
+            <p class="token-code" id="token-value">{{.Token}}</p>
+            <div class="copy-area">
+                <button id="copy-token" class="copy-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy Token
+                </button>
+            </div>
+        </div>
+
+        <div class="token-instructions">
+            <p><strong>Important:</strong> This token is your key to accessing your Inforia account. Please save it in a
+                secure location.</p>
+            <p>You can use either your email address or this token to log in to Inforia in the future.</p>
+        </div>
+
+        <a href="/" class="continue-button">Continue to Inforia</a>
+    </div>
+{{end}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const copyButton = document.getElementById('copy-token');
+
+        copyButton.addEventListener('click', function () {
+            const tokenValue = document.getElementById('token-value').textContent;
+
+            navigator.clipboard.writeText(tokenValue).then(function () {
+                // Visual feedback
+                copyButton.classList.add('copied');
+                copyButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Copied!
+                    `;
+
+                // Reset after 2 seconds
+                setTimeout(function () {
+                    copyButton.classList.remove('copied');
+                    copyButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            Copy Token
+                        `;
+                }, 2000);
+            }).catch(function (err) {
+                console.error('Could not copy text: ', err);
+            });
+        });
+    });
+</script>

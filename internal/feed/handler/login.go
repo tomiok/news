@@ -26,6 +26,13 @@ func (h *Handler) DoLogin(w http.ResponseWriter, r *http.Request) error {
 	email := r.FormValue("email")
 
 	if !isValidEmail(email) {
+		if len(email) == 44 { //is a token, TODO validate in the DB
+			return renderLoginPage(w, LoginPageData{
+				Email: email,
+				Error: "Error processing login, please try again",
+			}, h.Cache)
+		}
+
 		return renderLoginPage(w, LoginPageData{
 			Email: email,
 			Error: "Please enter a valid email address",
@@ -54,7 +61,10 @@ func (h *Handler) DoLogin(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// renderLoginPage renders the login page with data
+func (h *Handler) Token(w http.ResponseWriter, r *http.Request) error {
+	return web.TemplateRender(w, "token.page.tmpl", &web.TemplateData{Token: "hola"}, h.Cache)
+}
+
 func renderLoginPage(w http.ResponseWriter, data LoginPageData, cache bool) error {
 	err := web.TemplateRender(w, "login.page.tmpl", &web.TemplateData{
 		Email:    data.Email,
@@ -68,13 +78,11 @@ func renderLoginPage(w http.ResponseWriter, data LoginPageData, cache bool) erro
 	return nil
 }
 
-// isValidEmail validates the format of an email address
 func isValidEmail(email string) bool {
 	_, err := mail.ParseAddress(email)
 	return err == nil
 }
 
-// generateToken creates a secure random token
 func generateToken() (string, error) {
 	// Generate 32 bytes of random data
 	b := make([]byte, 32)
