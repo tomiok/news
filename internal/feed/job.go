@@ -99,6 +99,7 @@ func (a *JobContainer) Sanitize(articlesCh, out chan RawArticle) {
 				Location:    rawArt.Location,
 				PubDate:     rawArt.PubDate,
 				Categories:  rawArt.Categories,
+				SourceID:    rawArt.SourceID,
 			}
 		}(title, desc, content, rawContent, rawArt)
 	}
@@ -123,7 +124,7 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				Location:    rawArticle.Location,
 				PubDate:     rawArticle.PubDate,
 				Link:        createLink(rawArticle.Title, uid),
-				Source:      rawArticle.Source,
+				SourceID:    rawArticle.SourceID,
 				SavedAt:     time.Now().UnixMilli(),
 				Lang:        getLang(rawArticle.Country),
 				Categories:  rawArticle.Categories,
@@ -132,7 +133,6 @@ func (a *JobContainer) Save(ch chan RawArticle, done chan struct{}) {
 				_, ok := err.(*mysql.MySQLError)
 				log.Error().Err(err)
 				if !ok {
-					fmt.Println(err)
 					return
 				}
 			}
