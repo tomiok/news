@@ -9,8 +9,10 @@ import (
 )
 
 type LoginPageData struct {
-	Email string
-	Error string
+	Email        string
+	Error        string
+	Token        string
+	JustLoggedIn bool
 }
 
 func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) error {
@@ -38,6 +40,7 @@ func (h *Handler) DoLogin(w http.ResponseWriter, r *http.Request) error {
 			Error: "Please enter a valid email address",
 		}, false)
 	}
+
 	token, err := generateToken()
 	if err != nil {
 		return renderLoginPage(w, LoginPageData{
@@ -62,13 +65,24 @@ func (h *Handler) DoLogin(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) Token(w http.ResponseWriter, r *http.Request) error {
-	return web.TemplateRender(w, "token.page.tmpl", &web.TemplateData{Token: "hola"}, h.Cache)
+	c, err := r.Cookie("auth_token")
+	if err != nil {
+		return err
+	}
+
+	if len(c.Value) != 44 {
+		return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{}, h.Cache)
+	}
+
+	return web.TemplateRender(w, "token.page.tmpl", &web.TemplateData{Token: c.Value, JustLoggedIn: true}, h.Cache)
 }
 
 func renderLoginPage(w http.ResponseWriter, data LoginPageData, cache bool) error {
 	err := web.TemplateRender(w, "login.page.tmpl", &web.TemplateData{
-		Email:    data.Email,
-		LoginErr: data.Error,
+		Email:        data.Email,
+		LoginErr:     data.Error,
+		Token:        data.Token,
+		JustLoggedIn: data.JustLoggedIn,
 	}, cache)
 
 	if err != nil {

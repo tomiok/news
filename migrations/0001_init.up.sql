@@ -1,3 +1,14 @@
+CREATE TABLE sites
+(
+    id          SERIAL PRIMARY KEY,
+    url         VARCHAR(250) NOT NULL,
+    category    VARCHAR(150),
+    has_content BOOL,
+    country     VARCHAR(150),
+    location    VARCHAR(150),
+    enabled     BOOL DEFAULT true
+);
+
 CREATE TABLE articles
 (
     id          SERIAL PRIMARY KEY,
@@ -11,27 +22,14 @@ CREATE TABLE articles
     location    VARCHAR(100) NOT NULL,
     lang        VARCHAR(10)  NOT NULL,
     pub_date    BIGINT       NOT NULL,
-    source      varchar(255) NOT NULL,
     saved_at    BIGINT       NOT NULL,
+    site_id     INTEGER      NOT NULL REFERENCES sites (id),
     n_search    TSVECTOR,
     categories  TEXT[] NOT NULL DEFAULT '{}'::text[]
 );
 
-CREATE TABLE sites
-(
-    id          SERIAL PRIMARY KEY,
-    url         VARCHAR(250) NOT NULL,
-    category    VARCHAR(150),
-    has_content BOOL,
-    country     VARCHAR(150),
-    location    VARCHAR(150),
-    enabled     BOOL DEFAULT true
-);
-
 CREATE INDEX n_search_idx ON articles USING GIN (n_search);
-
--- https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/america/portada
--- https://www.terra.com/rss
+CREATE INDEX idx_articles_site_id ON articles(site_id);
 
 insert into sites (url, category, has_content, country, location)
 values ('https://www.rosario3.com/rss.html', 'actualidad', false, 'argentina', 'rosario'),
@@ -68,5 +66,8 @@ values ('https://www.rosario3.com/rss.html', 'actualidad', false, 'argentina', '
        ('https://diarioconurbano.com.ar/feed', 'actualidad', true, 'argentina', 'conurbano'),
        ('https://conurbanodiario.com.ar/?feed=rss2', 'actualidad', true, 'argentina', 'conurbano'),
        ('https://www.infoban.com.ar/feed/', 'actualidad', true, 'argentina', 'conurbano'),
-       ('https://www.inforegion.com.ar/feed/', 'actualidad', false, 'argentina', 'conurbano');
+       ('https://www.inforegion.com.ar/feed/', 'actualidad', false, 'argentina', 'conurbano'),
+       ('https://www.puraciudad.com.ar/feed', 'actualidad', true, 'argentina', 'caba'),
+       ('https://www.lapoliticaonline.com/files/rss/ultimasnoticias-es.xml', 'actualidad', false, 'argentina', 'caba'),
+       ('https://elciudadanoweb.com/feed', 'actualidad', true, 'argentina', 'rosario');
 

@@ -6,7 +6,7 @@
     {{block "navbar" .}}
     {{end}}
     <div class="feed">
-        {{if false}}
+        {{if .JustLoggedIn  }}
             {{block "login_success" .}}
             {{end}}
         {{end}}

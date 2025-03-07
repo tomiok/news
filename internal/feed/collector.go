@@ -1,4 +1,3 @@
-// Package feed is the responsible to hit RSS feeds and save into database.
 package feed
 
 import (
@@ -41,7 +40,7 @@ type RawArticle struct {
 	RawContent  string // do not use tags here.
 	Country     string // ISO code for the country AR, UY, BR...
 	Location    string // Specific location for a specific site.
-	Source      string // add the actual web portal.
+	SourceID    int64  // portal ID.
 	PubDate     int64
 	Categories  []string
 }
@@ -55,7 +54,7 @@ type Article struct {
 	Content     template.HTML `json:"content"`
 	Country     string        `json:"country"`
 	Location    string        `json:"location"`
-	Source      string        `json:"-"`
+	SourceID    int64         `json:"-"`
 
 	Lang string `json:"lang"`
 	Link string `json:"link,omitempty"`
@@ -133,7 +132,7 @@ func (r *rssCollector) Collect(ctx context.Context, site Site) ([]RawArticle, er
 
 		article.Country = site.Country
 		article.Location = site.Location
-		article.Source = site.URL
+		article.SourceID = site.ID
 		if len(item.Categories) > 0 { // could be with 1 but still empty
 			if item.Categories[0] != "" {
 				article.Categories = item.Categories
@@ -182,6 +181,7 @@ type Scanner interface {
 // Site is expressed as a website to be scanned. Among the URL, some others values are there to help the collector
 // when grabbing the data.
 type Site struct {
+	ID           int64
 	URL          string // the base URL of the RSS.
 	MainCategory string // The main category added if the feed do not provide any other.
 	HasContent   bool   // some RSS do not provide the content. Let's use the Description then.

@@ -1,5 +1,5 @@
 /* general styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
 
 * {
     margin: 0;
@@ -8,7 +8,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, #f4f4f4 0%, #e0e0e0 50%, #d4d4d4 100%);
     min-height: 100vh;
     display: flex;
@@ -31,6 +31,7 @@ body {
     font-family: 'Playfair Display', serif;
     font-size: 3rem;
     color: #333;
+    font-weight: 700;
 }
 
 .subtitle {
@@ -38,6 +39,8 @@ body {
     text-align: center;
     font-size: 22px;
     margin-bottom: 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
 }
 
 /* cards */
@@ -119,13 +122,14 @@ body {
 .card-title {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
 }
 
 .card-description {
     color: #666;
     margin-bottom: 1rem;
-    font-family: "Open Sans", sans-serif;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .card-content {
@@ -133,7 +137,7 @@ body {
     color: #333;
     line-height: 1.6;
     margin-bottom: 20px;
-    font-family: 'Noticia Text', serif;
+    font-family: 'Source Serif Pro', serif;
 }
 
 .card-container {
@@ -186,6 +190,7 @@ body {
     font-weight: bold;
     text-decoration: none;
     color: #333;
+    font-family: 'Playfair Display', serif;
 }
 
 /* Search */
@@ -200,6 +205,7 @@ body {
     border: 1px solid #ddd;
     border-radius: 20px;
     font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .search-input:focus {
@@ -229,6 +235,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .autocomplete-item:hover {
@@ -278,6 +285,7 @@ body {
     gap: 6px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .location-tag:hover {
@@ -350,7 +358,7 @@ body {
     background-color: #eae3e3;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    font-family: 'Noticia Text', serif;
+    font-family: 'Source Serif Pro', serif;
     font-size: 18px;
     line-height: 1.9;
     color: #2d3e50;
@@ -361,6 +369,7 @@ body {
     font-weight: bold;
     margin-bottom: 10px;
     color: #ad051d;
+    font-family: 'Playfair Display', serif;
 }
 
 /* Navigation buttons */
@@ -379,7 +388,7 @@ body {
     transition: all 0.3s ease;
     z-index: 1000;
     border: none;
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     text-decoration: none;
 }
 
@@ -446,6 +455,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .footer-links {
@@ -612,6 +622,7 @@ body {
     z-index: 1000;
     max-height: calc(100vh - 100px);
     overflow-y: auto;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .menu-items.show {
@@ -656,6 +667,7 @@ body {
     max-width: 500px;
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    font-family: 'DM Sans', sans-serif;
 }
 
 .close-modal {
@@ -675,6 +687,7 @@ body {
     margin-bottom: 15px;
     font-size: 20px;
     color: #333;
+    font-family: 'Playfair Display', serif;
 }
 
 .modal-input {
@@ -684,6 +697,7 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .modal-input:focus {
@@ -701,6 +715,7 @@ body {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .modal-button:hover {

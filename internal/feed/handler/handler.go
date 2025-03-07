@@ -2,9 +2,11 @@ package handler
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"news/internal/feed"
 	"news/platform/web"
+	"strconv"
 )
 
 // Handler will carry the services logic to the web layer.
@@ -25,6 +27,35 @@ func New(storage feed.Storage, cache bool) (*Handler, error) {
 		Service: service,
 		Cache:   cache,
 	}, nil
+}
+
+func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
+	articles, err := h.Service.GetFeed("")
+	if err != nil {
+		return err
+	}
+
+	logged := r.URL.Query().Get("loggedIn")
+	justLogged, _ := strconv.ParseBool(logged)
+
+	c, err := r.Cookie("auth_token")
+	if err != nil {
+		log.Error().Msg("cannot read cookie")
+	}
+
+	var token string
+	var isLogged bool
+	if len(c.Value) > 40 {
+		token = c.Value
+		isLogged = true
+	}
+
+	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
+		Articles:     articles,
+		JustLoggedIn: justLogged,
+		Token:        token,
+		IsLogged:     isLogged,
+	}, h.Cache)
 }
 
 // GetNews is a web handler that will return a news by the UID, provided in the path param.
@@ -50,19 +81,6 @@ func (h *Handler) GetNews(w http.ResponseWriter, r *http.Request) error {
 		Article: &article,
 	}, h.Cache)
 }
-
-func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
-	articles, err := h.Service.GetFeed("")
-	if err != nil {
-		return err
-	}
-
-	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
-		Articles: articles,
-	}, h.Cache)
-}
-
-const maxLocations = 3
 
 func (h *Handler) FeedsSearch(w http.ResponseWriter, r *http.Request) error {
 	q := r.URL.Query().Get("q")

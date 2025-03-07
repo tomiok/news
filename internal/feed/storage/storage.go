@@ -44,7 +44,7 @@ func NewStorage(url string) *SQLStorage {
 func (s *SQLStorage) SaveArticle(a feed.Article) (feed.Article, error) {
 	loc := strings.ToLower(a.Location)
 	_, err := s.Exec(`insert into articles 
-    (title, uid, description, content, raw_content, link, country, location, lang, source, pub_date, saved_at,categories, n_search) 
+    (title, uid, description, content, raw_content, link, country, location, lang, site_id, pub_date, saved_at,categories, n_search) 
 values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
 		a.Title,
 		a.UID,
@@ -55,7 +55,7 @@ values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
 		strings.ToLower(a.Country),
 		loc,
 		a.Lang,
-		a.Source,
+		a.SourceID,
 		a.PubDate,
 		a.SavedAt,
 		pq.Array(a.Categories),
@@ -70,7 +70,7 @@ values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13, to_tsvector($14))`,
 
 func (s *SQLStorage) GetArticleByUID(uid string) (feed.Article, error) {
 	var article feed.Article
-	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.country, a.location, a.lang, a.source, a.pub_date, a.categories from articles a where a.uid=$1", uid)
+	row := s.QueryRow("select a.id, a.uid, a.title, a.description, a.content, a.raw_content, a.country, a.location, a.lang, a.site_id, a.pub_date, a.categories from articles a where a.uid=$1", uid)
 	var categories []string
 	err := row.Scan(
 		&article.ID,
@@ -82,7 +82,7 @@ func (s *SQLStorage) GetArticleByUID(uid string) (feed.Article, error) {
 		&article.Country,
 		&article.Location,
 		&article.Lang,
-		&article.Source,
+		&article.SourceID,
 		&article.PubDate,
 		pq.Array(&categories),
 	)
@@ -158,7 +158,7 @@ func (s *SQLStorage) GetDBFeed(q string) ([]feed.Article, error) {
 }
 
 func (s *SQLStorage) GetSites() ([]feed.Site, error) {
-	rows, err := s.Query("select url, category, has_content, country, location from sites")
+	rows, err := s.Query("select id, url, category, has_content, country, location from sites")
 
 	if err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (s *SQLStorage) GetSites() ([]feed.Site, error) {
 	var result []feed.Site
 	for rows.Next() {
 		var site feed.Site
-		err = rows.Scan(&site.URL, &site.MainCategory, &site.HasContent, &site.Country, &site.Location)
+		err = rows.Scan(&site.ID, &site.URL, &site.MainCategory, &site.HasContent, &site.Country, &site.Location)
 		if err != nil {
 			log.Error().Err(err)
 		}

@@ -60,6 +60,10 @@ func routes(r *chi.Mux, deps *api.Dependencies) {
 		deps.AggregateJob.Do()
 	})
 
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/?notFound=true", http.StatusSeeOther)
+	})
+
 	fileServer(r)
 }
 
