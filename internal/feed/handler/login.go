@@ -70,7 +70,11 @@ func (h *Handler) Token(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	return web.TemplateRender(w, "token.page.tmpl", &web.TemplateData{Token: c.Value}, h.Cache)
+	if len(c.Value) != 44 {
+		return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{}, h.Cache)
+	}
+
+	return web.TemplateRender(w, "token.page.tmpl", &web.TemplateData{Token: c.Value, JustLoggedIn: true}, h.Cache)
 }
 
 func renderLoginPage(w http.ResponseWriter, data LoginPageData, cache bool) error {

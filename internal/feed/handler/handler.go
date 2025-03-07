@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"news/internal/feed"
 	"news/platform/web"
@@ -35,11 +36,25 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	logged := r.URL.Query().Get("loggedIn")
-	isLogged, _ := strconv.ParseBool(logged)
+	justLogged, _ := strconv.ParseBool(logged)
+
+	c, err := r.Cookie("auth_token")
+	if err != nil {
+		log.Error().Msg("cannot read cookie")
+	}
+
+	var token string
+	var isLogged bool
+	if len(c.Value) > 40 {
+		token = c.Value
+		isLogged = true
+	}
 
 	return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
 		Articles:     articles,
-		JustLoggedIn: isLogged,
+		JustLoggedIn: justLogged,
+		Token:        token,
+		IsLogged:     isLogged,
 	}, h.Cache)
 }
 

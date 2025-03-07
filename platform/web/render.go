@@ -35,6 +35,7 @@ type TemplateData struct {
 	LoginErr     string
 	Email        string
 	JustLoggedIn bool
+	IsLogged     bool
 
 	Token string
 }
