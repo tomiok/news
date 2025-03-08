@@ -41,6 +41,10 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) error {
 	c, err := r.Cookie("auth_token")
 	if err != nil {
 		log.Error().Msg("cannot read cookie")
+		return web.TemplateRender(w, "home.page.tmpl", &web.TemplateData{
+			Articles:     articles,
+			JustLoggedIn: justLogged,
+		}, h.Cache)
 	}
 
 	var token string
