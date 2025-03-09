@@ -28,8 +28,67 @@ CREATE TABLE articles
     categories  TEXT[] NOT NULL DEFAULT '{}'::text[]
 );
 
+CREATE TABLE "users"
+(
+    id         SERIAL PRIMARY KEY,
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    token      VARCHAR(255) NOT NULL,
+    created_at BIGINT       NOT NULL
+);
+
+CREATE TABLE users_sites
+(
+    id          SERIAL PRIMARY KEY,
+    url         VARCHAR(250) NOT NULL,
+    category    VARCHAR(150),
+    has_content BOOL,
+    country     VARCHAR(150),
+    location    VARCHAR(150),
+    user_id     INTEGER      NOT NULL REFERENCES users (id),
+    enabled     BOOL DEFAULT true
+);
+
+-- Create the trigger function
+CREATE
+OR REPLACE FUNCTION populate_user_sites()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insert all sites for the new user
+INSERT INTO users_sites (user_id,
+                         id,
+                         url,
+                         category,
+                         has_content,
+                         country,
+                         location,
+                         enabled)
+SELECT NEW.id, -- The ID of the newly inserted user
+       s.id,   -- Site ID
+       s.url,
+       s.category,
+       s.has_content,
+       s.country,
+       s.location,
+       s.enabled
+FROM sites s
+WHERE s.enabled = true;
+
+RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Create the trigger on the user table
+CREATE TRIGGER trigger_populate_user_sites
+    AFTER INSERT
+    ON "users"
+    FOR EACH ROW
+    EXECUTE FUNCTION populate_user_sites();
+
+
 CREATE INDEX n_search_idx ON articles USING GIN (n_search);
-CREATE INDEX idx_articles_site_id ON articles(site_id);
+CREATE INDEX idx_articles_site_id ON articles (site_id);
+CREATE INDEX idx_user_email ON "users" (email);
 
 insert into sites (url, category, has_content, country, location)
 values ('https://www.rosario3.com/rss.html', 'actualidad', false, 'argentina', 'rosario'),
