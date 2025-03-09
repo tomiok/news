@@ -4,14 +4,7 @@
             <a href="#" class="navbar-logo">Inforia</a>
             <div class="search-container">
                 <label>
-                    <input type="text" class="search-input"
-                           hx-get="/search"
-                           hx-target="#news"
-                           method="get"
-                           name="q"
-                           placeholder="busca noticias"
-                           autocomplete="off"
-                    >
+                    <input type="text" class="search-input" hx-get="/search" hx-target="#news" method="get" name="q" placeholder="busca noticias" autocomplete="off">
                 </label>
             </div>
             <div class="hamburger-menu">
@@ -27,7 +20,6 @@
                     {{else}}
                         <a href="/login" class="menu-item">Login</a>
                     {{end}}
-
                 </div>
             </div>
         </div>
@@ -38,19 +30,22 @@
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <h3>Add a Source</h3>
-            <form
-                    hx-post="/sources"
-                    hx-indicator="#spinner"
-            >
+
+            <!-- Success message (hidden by default) -->
+            <div id="success-message" class="success-message" style="display: none;">
+                Source saved successfully!
+            </div>
+
+            <form id="source-form">
                 <input type="url" name="sourceUrl" placeholder="Enter URL" required class="modal-input">
                 <div class="form-actions">
                     <button type="submit" class="modal-button">
                         Add Source
-                        <span class="htmx-indicator" id="spinner">
-                            <svg class="spinner" viewBox="0 0 50 50">
-                                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-                            </svg>
-                        </span>
+                        <span class="spinner-container" id="spinner" style="display: none;">
+            <svg class="spinner" viewBox="0 0 50 50">
+              <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+            </svg>
+          </span>
                     </button>
                 </div>
             </form>

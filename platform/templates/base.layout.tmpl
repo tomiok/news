@@ -121,6 +121,7 @@
             const addSourceBtn = document.getElementById('add-source-btn');
             const sourceModal = document.getElementById('source-modal');
             const closeModal = document.querySelector('.close-modal');
+            const successMessage = document.getElementById('success-message');
 
             // Toggle hamburger menu
             hamburgerButton.addEventListener('click', function() {
@@ -143,6 +144,11 @@
                 // Close the hamburger menu when opening modal
                 hamburgerButton.classList.remove('active');
                 menuItems.classList.remove('show');
+
+                // Hide success message when opening modal
+                if (successMessage) {
+                    successMessage.style.display = 'none';
+                }
             });
 
             // Close modal
@@ -170,6 +176,11 @@
                     sourceModal.classList.add('show');
                     hamburgerButton.classList.remove('active');
                     menuItems.classList.remove('show');
+
+                    // Hide success message when opening modal
+                    if (successMessage) {
+                        successMessage.style.display = 'none';
+                    }
                 });
 
                 closeModal.addEventListener('touchstart', function() {
@@ -177,8 +188,60 @@
                 });
             }
 
-            // Handle HTMX responses
+            const sourceForm = document.getElementById('source-form');
+            const spinner = document.getElementById('spinner');
 
+            if (sourceForm) {
+                sourceForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    // Show spinner
+                    spinner.style.display = 'inline-block';
+
+                    // Hide any previous success message
+                    if (successMessage) {
+                        successMessage.style.display = 'none';
+                    }
+
+                    // Get form data
+                    const formData = new FormData(sourceForm);
+
+                    // Create fetch request
+                    fetch('/sources', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+
+                            // Reset the form
+                            sourceForm.reset();
+
+                            // Show success message
+                            if (successMessage) {
+                                successMessage.style.display = 'block';
+                            }
+
+                            // Automatically close modal after 2 seconds
+                            setTimeout(function() {
+                                sourceModal.classList.remove('show');
+                            }, 2000);
+                        })
+                        .catch(error => {
+                            // Handle error
+                            console.error('Error:', error);
+
+                            // Show error message if needed
+                            // You could add an error element in your HTML and display it here
+                        })
+                        .finally(() => {
+                            // Hide spinner regardless of outcome
+                            spinner.style.display = 'none';
+                        });
+                });
+            }
         });
     </script>
     </body>

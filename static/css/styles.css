@@ -418,6 +418,27 @@ body {
     margin: 30px 0;
 }
 
+.success-message {
+    background-color: #dff0d8;
+    color: #3c763d;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #d6e9c6;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Animation for the success message */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#success-message {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
 /* Navigation buttons */
 .back-home {
     position: fixed;
