@@ -13,6 +13,8 @@ import (
 type Handler struct {
 	*feed.Service
 	Cache bool
+
+	SecureCookie bool
 }
 
 // New returns a *Handler if the service is created OK, otherwise an error.

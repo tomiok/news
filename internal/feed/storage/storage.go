@@ -21,7 +21,7 @@ type SQLStorage struct {
 	*sql.DB
 }
 
-func NewStorage(url string) *SQLStorage {
+func NewStorage(url string) *sql.DB {
 	db, err := sql.Open("postgres", url)
 
 	if err != nil {
@@ -36,9 +36,7 @@ func NewStorage(url string) *SQLStorage {
 		panic(err)
 	}
 
-	return &SQLStorage{
-		DB: db,
-	}
+	return db
 }
 
 func (s *SQLStorage) SaveArticle(a feed.Article) (feed.Article, error) {

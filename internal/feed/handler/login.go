@@ -28,7 +28,7 @@ func (h *Handler) DoLogin(w http.ResponseWriter, r *http.Request) error {
 	email := r.FormValue("email")
 
 	if !isValidEmail(email) {
-		if len(email) == 44 { //is a token, TODO validate in the DB
+		if len(email) > 40 { //is a token, TODO validate in the DB
 			return renderLoginPage(w, LoginPageData{
 				Email: email,
 				Error: "Error processing login, please try again",
@@ -53,10 +53,10 @@ func (h *Handler) DoLogin(w http.ResponseWriter, r *http.Request) error {
 		Name:     "auth_token",
 		Value:    token,
 		Path:     "/",
-		MaxAge:   86400, // 24 hours
+		MaxAge:   86400 * 365, // 1 year
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		// Secure: true, // Uncomment in production with HTTPS
+		Secure:   h.SecureCookie,
 	})
 
 	// Redirect to home with the token
