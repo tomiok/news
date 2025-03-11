@@ -1,4 +1,4 @@
-## The NEWS project
+## The Inforia project
 
 
 This little guy could fetch RSS from a lot of sites and put them togheter
@@ -16,7 +16,7 @@ docker compose down --remove-orphans --volumes
 ```
 ### Run only DB
 ```shell
-docker compose up db
+make db
 ```
 
 
