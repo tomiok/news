@@ -32,13 +32,14 @@ CREATE TABLE "users"
 (
     id         SERIAL PRIMARY KEY,
     email      VARCHAR(255) NOT NULL UNIQUE,
-    token      VARCHAR(255) NOT NULL,
+    token      VARCHAR(255) NOT NULL UNIQUE,
     created_at BIGINT       NOT NULL
 );
 
 CREATE TABLE users_sites
 (
-    id          SERIAL PRIMARY KEY,
+    id          serial primary key,
+    site_id     INTEGER,
     url         VARCHAR(250) NOT NULL,
     category    VARCHAR(150),
     has_content BOOL,
@@ -55,7 +56,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     -- Insert all sites for the new user
 INSERT INTO users_sites (user_id,
-                         id,
+                         site_id,
                          url,
                          category,
                          has_content,

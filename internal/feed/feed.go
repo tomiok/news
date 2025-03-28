@@ -17,11 +17,11 @@ type Service struct {
 	Storage
 }
 
-// NewService is for web API only and returns *Service and an Error.
-func NewService(storage Storage) (*Service, error) {
+// NewService is for web API only and returns *Service.
+func NewService(storage Storage) *Service {
 	return &Service{
 		Storage: storage,
-	}, nil
+	}
 }
 
 // GetNewsByUID give a UID (stored in DB) return an Article.

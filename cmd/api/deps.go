@@ -53,6 +53,7 @@ func NewDeps() *Dependencies {
 
 	_db := storage.NewStorage(dsn)
 	_storage := &storage.SQLStorage{DB: _db}
+	_userStorage := &storage.UserStorage{DB: _db}
 
 	_job, err := feed.NewJob(_storage)
 
@@ -60,7 +61,7 @@ func NewDeps() *Dependencies {
 		log.Fatal().Msg(err.Error())
 	}
 
-	_collectorHandler, err := handler.New(_storage, tempCache)
+	_collectorHandler, err := handler.New(_storage, _userStorage, tempCache)
 
 	if err != nil {
 		log.Fatal().Msg(err.Error())
