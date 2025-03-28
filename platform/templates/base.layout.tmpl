@@ -204,12 +204,18 @@
                     }
 
                     // Get form data
-                    const formData = new FormData(sourceForm);
+                    const sourceUrl = document.getElementById('sourceUrl').value;
 
+                    const jsonData = {
+                        sourceUrl: sourceUrl
+                    };
                     // Create fetch request
                     fetch('/sources', {
                         method: 'POST',
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonData)
                     })
                         .then(response => {
                             if (!response.ok) {

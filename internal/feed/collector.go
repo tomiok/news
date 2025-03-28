@@ -86,7 +86,6 @@ func (r *rssCollector) Collect(ctx context.Context, site Site) ([]RawArticle, er
 	now := time.Now().UnixMilli()
 
 	feed, err := r.Parser.ParseURLWithContext(site.URL, ctx)
-
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse feed for URL %s - %w", site.URL, err)
 	}

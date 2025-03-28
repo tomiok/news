@@ -12,6 +12,8 @@ const tokenMinLength = 40
 type UserStorage interface {
 	Save(email, token string) (string, error)
 	Validate(token string) error
+
+	SaveSource(sourceURL, place string, userID int) error
 }
 
 type UserService struct {
@@ -38,6 +40,10 @@ func (u *UserService) UserLogin(emailOrToken string) (string, error) {
 	}
 
 	return u.Save(emailOrToken, token)
+}
+
+func (u *UserService) SaveNewSource(sourceURL, place string, userID int) error {
+	return u.SaveSource(sourceURL, place, userID)
 }
 
 func isValidEmail(email string) bool {

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"news/platform/web"
 )
@@ -10,6 +11,10 @@ type LoginPageData struct {
 	Error        string
 	Token        string
 	JustLoggedIn bool
+}
+
+type SourceRequest struct {
+	SourceURL string `json:"sourceUrl"`
 }
 
 func (h *Handler) LoginHandler(w http.ResponseWriter, r *http.Request) error {
@@ -44,6 +49,20 @@ func (h *Handler) DoLogin(w http.ResponseWriter, r *http.Request) error {
 	// Redirect to home with the token
 	http.Redirect(w, r, "/?loggedIn=true", http.StatusSeeOther)
 	return nil
+}
+
+func (h *Handler) AddSource(w http.ResponseWriter, r *http.Request) error {
+	body := r.Body
+	defer func() {
+		_ = body.Close()
+	}()
+
+	var req SourceRequest
+	if err := json.NewDecoder(body).Decode(&req); err != nil {
+		return err
+	}
+
+	return h.UserService.SaveNewSource(req.SourceURL, "argentina", 1)
 }
 
 func (h *Handler) Token(w http.ResponseWriter, r *http.Request) error {

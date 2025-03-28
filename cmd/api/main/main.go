@@ -54,14 +54,12 @@ func routes(r *chi.Mux, deps *api.Dependencies) {
 	r.Get("/login", api.Unwrap(deps.CollectorHandler.LoginHandler))
 	r.Post("/login", api.Unwrap(deps.CollectorHandler.DoLogin))
 
+	r.Post("/sources", api.Unwrap(deps.CollectorHandler.AddSource))
+
 	r.Get("/token", api.Unwrap(deps.CollectorHandler.Token))
 
 	r.Post("/force", func(w http.ResponseWriter, r *http.Request) {
 		deps.AggregateJob.Do()
-	})
-
-	r.Post("/sources", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
