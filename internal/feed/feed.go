@@ -1,26 +1,30 @@
 package feed
 
-import (
-	"github.com/rs/zerolog/log"
-	"time"
-)
-
 const (
 	Argentina = "argentina"
-	CABA      = "caba"
 )
 
 // Storage will interact with the DB.
 type Storage interface {
 	SaveArticle(a Article) (Article, error)
 	GetArticleByUID(uid string) (Article, error)
-
 	GetDBFeed(q string) ([]Article, error)
-
 	GetSites() ([]Site, error)
 }
 
-// GetNewsByUID give a UID (stored in DB) return an *Article.
+// Service is a middleware for web API.
+type Service struct {
+	Storage
+}
+
+// NewService is for web API only and returns *Service.
+func NewService(storage Storage) *Service {
+	return &Service{
+		Storage: storage,
+	}
+}
+
+// GetNewsByUID give a UID (stored in DB) return an Article.
 func (s *Service) GetNewsByUID(uid string) (Article, error) {
 	article, err := s.Storage.GetArticleByUID(uid)
 
@@ -40,14 +44,4 @@ func (s *Service) GetFeed(q string) ([]Article, error) {
 	}
 
 	return feed, nil
-}
-
-func Collect(d time.Duration, job JobAggregator) {
-	ticker := time.NewTicker(d)
-	for _ = range ticker.C {
-		now := time.Now()
-		job.Do()
-
-		log.Info().Msgf("job duration: %s", time.Since(now))
-	}
 }

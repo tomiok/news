@@ -25,12 +25,6 @@ type Collector interface {
 	Collect(ctx context.Context, s Site) ([]RawArticle, error)
 }
 
-// Service is a middleware for web API.
-type Service struct {
-	Storage
-	views []string
-}
-
 // RawArticle is the same as we can get in RSS feed.
 type RawArticle struct {
 	HasContent  bool
@@ -68,31 +62,9 @@ type Article struct {
 	Categories []string `json:"categories,omitempty"` // we have the category ids here.
 }
 
-func (a *Article) SinceMinutes() {
-	minutes := int(time.Since(time.UnixMilli(a.PubDate)).Minutes())
-
-	if minutes <= 60 {
-		a.Since = fmt.Sprintf("hace %d minutos", minutes)
-	} else {
-		hours := minutes / 60
-		if hours == 1 {
-			a.Since = "hace 1 hora"
-		} else {
-			a.Since = fmt.Sprintf("hace %d horas", hours)
-		}
-	}
-}
-
 // rssCollector the RSS implementation of the Collector interface.
 type rssCollector struct {
 	Parser *gofeed.Parser
-}
-
-// NewService is for web API only and returns *Service and an Error.
-func NewService(storage Storage) (*Service, error) {
-	return &Service{
-		Storage: storage,
-	}, nil
 }
 
 // newCollector returns a *Collector.
@@ -172,38 +144,27 @@ func (a RawArticle) String() string {
 	return fmt.Sprintf("Title: %s, desc: %s, content: %s, cat: %s", a.Title, a.Description, a.Content, a.Description)
 }
 
-// Scanner interface could fetch the data from some file, containing
-// url, main-category, has-content,
-type Scanner interface {
-	Scan() []Site
-}
+func (a *Article) SinceMinutes() {
+	minutes := int(time.Since(time.UnixMilli(a.PubDate)).Minutes())
 
-// Site is expressed as a website to be scanned. Among the URL, some others values are there to help the collector
-// when grabbing the data.
-type Site struct {
-	ID           int64
-	URL          string // the base URL of the RSS.
-	MainCategory string // The main category added if the feed do not provide any other.
-	HasContent   bool   // some RSS do not provide the content. Let's use the Description then.
-	Country      string // Country of the site.
-	Location     string // City or other location (province, state, etc)
-}
-
-type siteScanner struct {
-	Storage
-}
-
-func newSiteScanner(storage Storage) *siteScanner {
-	return &siteScanner{
-		Storage: storage,
+	if minutes <= 60 {
+		a.Since = fmt.Sprintf("hace %d minutos", minutes)
+	} else {
+		hours := minutes / 60
+		if hours == 1 {
+			a.Since = "hace 1 hora"
+		} else {
+			a.Since = fmt.Sprintf("hace %d horas", hours)
+		}
 	}
 }
 
-func (s *siteScanner) Scan() []Site {
-	sites, err := s.Storage.GetSites()
+func Collect(d time.Duration, job JobAggregator) {
+	ticker := time.NewTicker(d)
+	for _ = range ticker.C {
+		now := time.Now()
+		job.Do()
 
-	if err != nil {
-		log.Error().Err(err)
+		log.Info().Msgf("job duration: %s", time.Since(now))
 	}
-	return sites
 }

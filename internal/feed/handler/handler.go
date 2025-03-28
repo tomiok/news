@@ -12,20 +12,21 @@ import (
 // Handler will carry the services logic to the web layer.
 type Handler struct {
 	*feed.Service
+	*feed.UserService
 	Cache bool
+
+	SecureCookie bool
 }
 
 // New returns a *Handler if the service is created OK, otherwise an error.
-func New(storage feed.Storage, cache bool) (*Handler, error) {
-	service, err := feed.NewService(storage)
-
-	if err != nil {
-		return nil, err
-	}
+func New(storage feed.Storage, userStorage feed.UserStorage, cache bool) (*Handler, error) {
+	service := feed.NewService(storage)
+	userService := feed.NewUserService(userStorage)
 
 	return &Handler{
-		Service: service,
-		Cache:   cache,
+		Service:     service,
+		UserService: userService,
+		Cache:       cache,
 	}, nil
 }
 

@@ -51,14 +51,17 @@ func NewDeps() *Dependencies {
 
 	migrationsDSN := fmt.Sprintf("%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	_storage := storage.NewStorage(dsn)
+	_db := storage.NewStorage(dsn)
+	_storage := &storage.SQLStorage{DB: _db}
+	_userStorage := &storage.UserStorage{DB: _db}
+
 	_job, err := feed.NewJob(_storage)
 
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
 
-	_collectorHandler, err := handler.New(_storage, tempCache)
+	_collectorHandler, err := handler.New(_storage, _userStorage, tempCache)
 
 	if err != nil {
 		log.Fatal().Msg(err.Error())
